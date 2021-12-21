@@ -1,5 +1,5 @@
-name: 'Terraform Plan - Single Workspace'
-description: 'Runs a terraform plan for a repo without an environment.'
+name: 'Terraform Apply - Single Environment'
+description: 'Runs a terraform apply for a repo without an environment.'
 inputs:
   ssh-private-key:
     description: 'Private key for ssh agent.'
@@ -23,27 +23,21 @@ runs:
     - name: TF Plan - Setup
       run: |
         terraform version
-        terraform init -lock=false -input=false
+        terraform init -lock=true -lock-timeout=0s -input=false
         terraform validate
         terraform workspace show
       shell: bash
     - name: TF Plan - Run
       id: plan
       run: |
-        terraform plan -lock=false -input=false -out=tfplan
+        terraform plan -lock=true -lock-timeout=0s -input=false -out=tfplan
       shell: bash
-    - name: TF Plan - show
+    - name: TF Plan - Show
       id: show_plan
       run: |
         terraform show tfplan
       shell: bash
-    - name: Post Plan Comment
-      if: always() && github.ref != ${{ github.event.repository.default_branch }} && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
-      uses: robburger/terraform-pr-commenter@v1.5.0
-      env:
-        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-        EXPAND_SUMMARY_DETAILS: "false"
-      with:
-        commenter_type: plan
-        commenter_input: ${{ format('{0}{1}', steps.show_plan.outputs.stdout, steps.plan.outputs.stderr) }}
-        commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+    - name: TF Apply - Run
+      run: |
+        terraform apply -lock=true -lock-timeout=0s -input=false tfplan
+      shell: bash
