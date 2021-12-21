@@ -22,7 +22,7 @@ runs:
     - name: HashiCorp - Setup Terraform
       uses: hashicorp/setup-terraform@v1.2.1
       with:
-        terraform_version: ${{ inputs.terraform-version }}
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
     - name: TF Plan - Setup
       run: |
         terraform version
