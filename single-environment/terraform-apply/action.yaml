@@ -41,3 +41,4 @@ runs:
       run: |
         terraform apply -lock=true -lock-timeout=0s -input=false tfplan
       shell: bash
+      

@@ -15,3 +15,4 @@ runs:
       repo: GetTerminus/eks-infra
       ref: master
       inputs: '{"environment": "all"}'
+      

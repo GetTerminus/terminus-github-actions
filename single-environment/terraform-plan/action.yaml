@@ -47,3 +47,4 @@ runs:
         commenter_type: plan
         commenter_input: ${{ format('{0}{1}', steps.show_plan.outputs.stdout, steps.plan.outputs.stderr) }}
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+        
