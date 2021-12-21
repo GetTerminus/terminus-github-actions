@@ -1,5 +1,5 @@
 name: 'Terraform Apply - Single Environment'
-description: 'Runs a terraform apply for a repo without an environment.'
+description: 'Runs a terraform apply for a repo with a single environment.'
 inputs:
   ssh-private-key:
     description: 'Private key for ssh agent.'

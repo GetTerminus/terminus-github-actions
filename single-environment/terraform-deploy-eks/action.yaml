@@ -1,5 +1,5 @@
-name: 'Terraform Apply - Single Environment'
-description: 'Runs a terraform apply for a repo without an environment.'
+name: 'Terraform Deploy EKS - Single Environment'
+description: 'Triggers a workflow dispatch of EKS Infra - Terraform Apply.'
 inputs:
   pull-access-token:
     description: 'Github pull access token.'

@@ -1,5 +1,5 @@
-name: 'Terraform Plan - Single Workspace'
-description: 'Runs a terraform plan for a repo without an environment.'
+name: 'Terraform Plan - Single Environment'
+description: 'Runs a terraform plan for a repo with a single environment.'
 inputs:
   ssh-private-key:
     description: 'Private key for ssh agent.'
