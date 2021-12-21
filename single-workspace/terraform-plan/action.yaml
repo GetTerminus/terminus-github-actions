@@ -7,6 +7,9 @@ inputs:
   terraform-version:
     description: 'Version of terraform to use.'
     required: true
+  github-token:
+    description: 'Github token for plan commenter to use.'
+    required: true
 runs:
   using: "composite"
   steps:
