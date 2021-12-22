@@ -1,0 +1,59 @@
+name: 'Terraform Apply - Multiple Workspaces'
+description: 'Runs a terraform apply for a repo with a multiple workspaces (i.e. most terminus repos).'
+inputs:
+  ssh-private-key:
+    description: 'Private key for ssh agent.'
+    required: true
+  terraform-version:
+    description: 'Version of terraform to use.'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Install SSH Key
+      uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ secrets.GH_ACTIONS_SSH_PRIVATE_KEY }}
+    - name: Install Datadog CI
+      run: |
+        yarn global add @datadog/datadog-ci
+      shell: bash
+    - name: Pull
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.deployment.ref }}
+    - name: Upload Git MetaData to Datadog
+      run: |
+        datadog-ci git-metadata upload
+      shell: bash
+    - name: Deployment Pending
+      uses: deliverybot/deployment-status@v1
+      with:
+        state: pending
+        token: ${{ github.token }}
+    - name: HashiCorp - Setup Terraform
+      uses: hashicorp/setup-terraform@v1.2.1
+      with:
+        terraform_version: ${{ inputs.terraform-version }}
+    - name: TF Apply
+      run: |
+        terraform version
+        terraform init -lock=false -input=false
+        terraform validate
+        terraform workspace show
+        terraform plan -var-file=vars/$TF_WORKSPACE.tfvars -lock=true -lock-timeout=0s -input=false -out=tfplan .
+        terraform apply -lock=true -lock-timeout=0s -input=false tfplan
+      shell: bash
+    - name: Deployment Success
+      if: success()
+      uses: deliverybot/deployment-status@v1
+      with:
+        state: success
+        token: ${{ github.token }}
+    - name: Deployment Failure
+      if: failure()
+      uses: deliverybot/deployment-status@v1
+      with:
+        state: failure
+        token: ${{ github.token }}
+      
