@@ -31,7 +31,7 @@ runs:
       with:
         state: pending
         token: ${{ github.token }}
-    - name: Helm setup
+    - name: Helm Update
       if: ${{ inputs.artifactory-enabled }} == 'true'
       run: |
         helm repo add terminus https://getterminus.jfrog.io/artifactory/default-helm/ --username developer --password ${{ secrets.ARTIFACTORY_READONLY_ACCESS_TOKEN }}
