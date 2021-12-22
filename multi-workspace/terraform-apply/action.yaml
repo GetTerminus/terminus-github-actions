@@ -31,6 +31,13 @@ runs:
       with:
         state: pending
         token: ${{ github.token }}
+    - name: Helm setup
+      if: ${{ inputs.artifactory-enabled }} == 'true'
+      run: |
+        helm repo add terminus https://getterminus.jfrog.io/artifactory/default-helm/ --username developer --password ${{ secrets.ARTIFACTORY_READONLY_ACCESS_TOKEN }}
+        helm repo update
+        helm dependency update $CHART_PATH
+      shell: bash
     - name: HashiCorp - Setup Terraform
       uses: hashicorp/setup-terraform@v1.2.1
       with:
