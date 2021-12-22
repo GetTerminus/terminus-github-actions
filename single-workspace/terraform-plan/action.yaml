@@ -14,6 +14,10 @@ inputs:
     description: 'Enable the tf plan commenter.'
     required: false
     default: 'true'
+  initial-run:
+    description: 'If true workspace will be created based on TF_WORKSPACE'
+    required: false
+    default: 'false'
 runs:
   using: "composite"
   steps:
@@ -27,10 +31,18 @@ runs:
       uses: hashicorp/setup-terraform@v1.2.1
       with:
         terraform_version: ${{ inputs.terraform-version }}
-    - name: TF Plan - Setup
+    - name: TF Plan - Initialize
       run: |
         terraform version
         terraform init -lock=false -input=false
+      shell: bash
+    - name: TF Plan - Create Workspace
+      if: ${{ inputs.initial-run }} == 'true'
+      run: |
+        terraform workspace new $TF_WORKSPACE
+      shell: bash
+    - name: TF Plan - Validate
+      run: |
         terraform validate
         terraform workspace show
       shell: bash
