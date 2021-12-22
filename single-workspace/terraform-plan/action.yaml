@@ -10,10 +10,13 @@ inputs:
   github-token:
     description: 'Github token for plan commenter to use.'
     required: true
+<<<<<<< HEAD
   enable-plan-commenter:
     description: 'Enable the tf plan commenter.'
     required: false
     default: 'true'
+=======
+>>>>>>> main
 runs:
   using: "composite"
   steps:
