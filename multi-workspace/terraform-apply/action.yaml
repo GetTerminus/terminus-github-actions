@@ -7,6 +7,10 @@ inputs:
   terraform-version:
     description: 'Version of terraform to use.'
     required: true
+  artifactory-enabled:
+    description: 'Whether or not the repo uses artifactory for the helm chart.'
+    default: 'false'
+    required: false
 runs:
   using: "composite"
   steps:
