@@ -15,7 +15,9 @@ inputs:
     required: false
     default: 'true'
   initial-run:
-    description: 'If true workspace will be created based on TF_WORKSPACE'
+    description: 'If true workspace will be created based on TF_WORKSPACE.
+                  This should only be run when creating the repo and running
+                  the plan for the first time and removed after.'
     required: false
     default: 'false'
 runs:
@@ -39,7 +41,7 @@ runs:
     - name: TF Plan - Create Workspace
       if: ${{ inputs.initial-run }} == 'true'
       run: |
-        terraform workspace new $TF_WORKSPACE
+        terraform workspace new ${{ env.TF_WORKSPACE }}
       shell: bash
     - name: TF Plan - Validate
       run: |
