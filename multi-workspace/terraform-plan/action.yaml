@@ -23,6 +23,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: TEST
+      run: |
+        echo github.ref = ${{ github.ref }}
+        echo github.event.repository.default_branch = ${{ github.event.repository.default_branch }}
+      shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
       with:
