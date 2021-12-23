@@ -38,6 +38,7 @@ runs:
       run: |
         terraform version
         terraform init -lock=false -input=false
+        echo ${{ inputs.initial-run }}
       shell: bash
     - name: Post TF Init Comment
       if: always() && github.ref != ${{ github.event.repository.default_branch }} && ${{ inputs.enable-plan-commenter }} == 'true' &&  (steps.init.outcome == 'success' || steps.init.outcome == 'failure')
