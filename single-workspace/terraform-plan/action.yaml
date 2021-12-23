@@ -51,7 +51,7 @@ runs:
         commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
         commenter_exitcode: ${{ steps.init.outputs.exitcode }}
     - name: TF Plan - Create Workspace
-      if: ${{ inputs.initial-run }} == 'true'
+      if: ${{ inputs.initial-run == 'true' }}
       run: |
         terraform workspace new ${{ env.TF_WORKSPACE }}
         terraform workspace select ${{ env.TF_WORKSPACE }}
