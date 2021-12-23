@@ -27,7 +27,7 @@ runs:
       run: |
         echo github.ref = ${{ github.ref }}
         echo github.event.repository.default_branch = 'refs/heads/${{ github.event.repository.default_branch }}'
-        echo github.ref == github.event.repository.default_branch ${{ github.ref }} == 'refs/heads/${{ github.event.repository.default_branch}}'
+        echo ${{ github.ref }} == 'refs/heads/${{ github.event.repository.default_branch}}'
       shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
