@@ -41,8 +41,8 @@ runs:
       shell: bash
     - name: TEST
       run: |
-        echo steps.test.outcome = ${{ steps.init.outcome }}
-        echo or evaluation = ${{ (steps.init.outcome == 'success' || steps.init.outcome == 'failure') }}
+        echo steps.test.outcome = ${{ steps.test.outcome }}
+        echo or evaluation = ${{ (steps.test.outcome == 'success' || steps.test.outcome == 'failure') }}
       shell: bash
     - name: Post TF Init Comment
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable-plan-commenter == 'true' && (steps.test.outcome == 'success' || steps.init.outcome == 'failure') }} #&& ${{ inputs.enable-plan-commenter == 'true' }} #&& (steps.init.outcome == 'success' || steps.init.outcome == 'failure') }}
