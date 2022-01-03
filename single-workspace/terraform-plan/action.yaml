@@ -40,7 +40,7 @@ runs:
       #continue-on-error: true
       shell: bash
     - name: Post Format
-      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable-plan-commenter == 'true' }}
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
       uses: robburger/terraform-pr-commenter@v1.5.0
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
@@ -58,7 +58,7 @@ runs:
     - name: Post TF Init Comment
       # TODO: Add in the below code to all plan commenter if statements when github adds in the functionality
       # (steps.init.outcome == 'success' || steps.init.outcome == 'failure')
-      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable-plan-commenter == 'true' }}
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
       uses: robburger/terraform-pr-commenter@v1.5.0
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
@@ -80,7 +80,7 @@ runs:
         terraform workspace show
       shell: bash
     - name: Post TF Validate Comment
-      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable-plan-commenter == 'true' }}
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
       uses: robburger/terraform-pr-commenter@v1.5.0
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
