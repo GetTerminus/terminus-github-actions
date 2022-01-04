@@ -11,9 +11,7 @@ inputs:
     description: 'Whether or not the repo uses artifactory for the helm chart.'
     default: 'false'
     required: false
-  artifactory-access-token:
-    description: 'Artifactory access token.'
-    required: false
+
 runs:
   using: "composite"
   steps:
@@ -41,7 +39,7 @@ runs:
     - name: Helm Update
       if: ${{ inputs.artifactory-enabled }} == 'true'
       run: |
-        helm repo add terminus https://getterminus.jfrog.io/artifactory/default-helm/ --username developer --password ${{ inputs.artifactory-access-token }}
+        helm repo add terminus https://getterminus.jfrog.io/artifactory/default-helm/ --username developer --password $ARTIFACTORY_READONLY_ACCESS_TOKEN
         helm repo update
         helm dependency update $CHART_PATH
       shell: bash
