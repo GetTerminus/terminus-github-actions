@@ -98,7 +98,7 @@ runs:
     - name: TF Plan - Show
       id: show_plan
       run: |
-        terraform show tfplan
+        terraform show tfplan | sed '/Objects have changed outside of Terraform./,/actions to undo or respond to these changes./d'
       shell: bash
     - name: Post TF Plan Comment
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable-plan-commenter == 'true' }}
