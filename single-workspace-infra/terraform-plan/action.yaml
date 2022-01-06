@@ -91,6 +91,10 @@ runs:
       run: |
         terraform plan -lock=false -input=false -out=tfplan
       shell: bash
+    - name: Remove Unnecessary Lines From Plan
+      run: |
+        cat tfplan
+      shell: bash
     - name: TF Plan - Show
       id: show_plan
       run: |
