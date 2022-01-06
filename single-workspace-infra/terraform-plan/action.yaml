@@ -93,7 +93,7 @@ runs:
       shell: bash
     - name: Remove Unnecessary Lines From Plan
       run: |
-        sed '/Note: Objects have changed outside of Terraform./,/actions to undo or respond to these changes./d' tfplan
+        sed '/Objects have changed outside of Terraform./,/actions to undo or respond to these changes./d' tfplan
       shell: bash
     - name: TF Plan - Show
       id: show_plan
