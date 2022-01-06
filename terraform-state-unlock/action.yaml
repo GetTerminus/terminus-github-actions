@@ -1,0 +1,27 @@
+name: 'Terraform State Unlock'
+description: 'Unlocks the terraform state file using the lock id.'
+inputs:
+  lock_id:
+    description: 'Lock id of terraform state file.'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install SSH Key
+      uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ env.GH_ACTIONS_SSH_PRIVATE_KEY }}
+    - name: Pull
+      uses: actions/checkout@v2
+    - name: HashiCorp - Setup Terraform
+      uses: hashicorp/setup-terraform@v1.2.1
+      with:
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
+    - name: Unlock Terraform State File
+      run: |
+        terraform version
+        terraform init -lock=false -input=false
+        terraform force-unlock -force ${{ inputs.lock_id }}
+      shell: bash
+        

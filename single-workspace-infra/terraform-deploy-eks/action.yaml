@@ -1,4 +1,4 @@
-name: 'Terraform Deploy EKS - Single Environment'
+name: 'Terraform Deploy EKS - Single Workspace'
 description: 'Triggers a workflow dispatch of EKS Infra - Terraform Apply.'
 inputs:
   pull-access-token:

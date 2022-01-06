@@ -1,12 +1,6 @@
 name: 'Terraform Apply - Multiple Workspaces'
 description: 'Runs a terraform apply for a repo with a multiple workspaces (i.e. most terminus repos).'
 inputs:
-  ssh-private-key:
-    description: 'Private key for ssh agent.'
-    required: true
-  terraform-version:
-    description: 'Version of terraform to use.'
-    required: true
   artifactory-enabled:
     description: 'Whether or not the repo uses artifactory for the helm chart.'
     default: 'false'
@@ -18,7 +12,7 @@ runs:
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
       with:
-        ssh-private-key: ${{ inputs.ssh-private-key }}
+        ssh-private-key: ${{ env.GH_ACTIONS_SSH_PRIVATE_KEY }}
     - name: Install Datadog CI
       run: |
         yarn global add @datadog/datadog-ci
@@ -46,7 +40,7 @@ runs:
     - name: HashiCorp - Setup Terraform
       uses: hashicorp/setup-terraform@v1.2.1
       with:
-        terraform_version: ${{ inputs.terraform-version }}
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
     - name: TF Apply
       run: |
         terraform version
