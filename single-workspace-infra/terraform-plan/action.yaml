@@ -101,7 +101,7 @@ runs:
       run: |
         CLEAN_INFO="*************************************************************************************************\nThe section of the plan showing diffs of objects changed outside of Terraform will be removed.\n*************************************************************************************************"
         CLEAN_PLAN=$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')
-        CLEAN_PLAN="${CLEAN_INFO} ${CLEAN_PLAN}"
+        CLEAN_PLAN+="${CLEAN_INFO}"
         CLEAN_PLAN="${CLEAN_PLAN//'%'/'%25'}"
         CLEAN_PLAN="${CLEAN_PLAN//$'\n'/'%0A'}"
         CLEAN_PLAN="${CLEAN_PLAN//$'\r'/'%0D'}"
