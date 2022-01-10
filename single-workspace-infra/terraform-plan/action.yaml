@@ -94,21 +94,21 @@ runs:
     - name: TF Plan - Show
       id: show_plan
       run: |
-        terraform show tfplan | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d'
+        echo "::set-output name=clean_plan::$(terraform show tfplan | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')"
       shell: bash
-    - name: Clean Plan
-      id: show_plan_clean
-      run: |
-        echo "::set-output name=show_plan::$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')"
-        CLEAN_PLAN=$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d') >> $GITHUB_ENV
-        echo $CLEAN_PLAN
-      shell: bash
-    - name: Test
-      id: test
-      run: |
-        echo "find this line"
-        echo "${{ steps.show_plan.outputs.stdout }}"
-      shell: bash
+    # - name: Clean Plan
+    #   id: show_plan_clean
+    #   run: |
+    #     echo "::set-output name=show_plan::$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')"
+    #     CLEAN_PLAN=$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d') >> $GITHUB_ENV
+    #     echo $CLEAN_PLAN
+    #   shell: bash
+    # - name: Test
+    #   id: test
+    #   run: |
+    #     echo "find this line"
+    #     echo "${{ steps.show_plan.outputs.stdout }}"
+    #   shell: bash
     - name: Post TF Plan Comment
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable-plan-commenter == 'true' }}
       uses: robburger/terraform-pr-commenter@v1.5.0
@@ -117,6 +117,6 @@ runs:
         EXPAND_SUMMARY_DETAILS: "false"
       with:
         commenter_type: plan
-        commenter_input: ${{ format('{0}{1}', steps.show_plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        commenter_input: ${{ format('{0}{1}', steps.show_plan.outputs.clean_plan, steps.plan.outputs.stderr) }}
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
         
