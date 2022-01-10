@@ -105,7 +105,7 @@ runs:
     - name: Test
       id: test
       run: |
-        echo "${CLEAN_PLAN}
+        echo "${CLEAN_PLAN}"
       shell: bash
     - name: Post TF Plan Comment
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable-plan-commenter == 'true' }}
