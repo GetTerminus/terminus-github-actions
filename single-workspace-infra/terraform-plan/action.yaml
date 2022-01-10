@@ -110,6 +110,6 @@ runs:
         EXPAND_SUMMARY_DETAILS: "false"
       with:
         commenter_type: plan
-        commenter_input: ${{ format('{0}{1}', steps.show_plan_clean.outputs.stdout, steps.plan.outputs.stderr) }}
+        commenter_input: ${{ format('{0}{1}', $CLEAN_PLAN, steps.plan.outputs.stderr) }}
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
         
