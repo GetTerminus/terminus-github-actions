@@ -100,8 +100,6 @@ runs:
       id: show_plan_clean
       run: |
         CLEAN_PLAN=$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')
-        echo "::set-output name=clean_plan::$(echo "$CLEAN_PLAN")"
-        echo "This is the clean plan"
         echo "$CLEAN_PLAN"
       shell: bash
     - name: Test
@@ -118,6 +116,6 @@ runs:
         EXPAND_SUMMARY_DETAILS: "false"
       with:
         commenter_type: plan
-        commenter_input: ${{ format('{0}{1}', steps.show_plan_clean.outputs.clean_plan, steps.plan.outputs.stderr) }}
+        commenter_input: ${{ format('{0}{1}', steps.show_plan_clean.outputs.stdout, steps.plan.outputs.stderr) }}
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
         
