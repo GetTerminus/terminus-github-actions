@@ -97,19 +97,16 @@ runs:
         terraform show tfplan
       shell: bash
     - name: Clean Plan
-      id: show_plan_clean
+      id: show_clean_plan
       run: |
+        echo "*************************************************************************************************"
+        echo "The section of the plan showing diffs of objects changed outside of Terraform will be removed."
+        echo "*************************************************************************************************"
         CLEAN_PLAN=$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')
         CLEAN_PLAN="${CLEAN_PLAN//'%'/'%25'}"
         CLEAN_PLAN="${CLEAN_PLAN//$'\n'/'%0A'}"
         CLEAN_PLAN="${CLEAN_PLAN//$'\r'/'%0D'}"
         echo "::set-output name=clean_plan::$(echo "$CLEAN_PLAN")"
-      shell: bash
-    - name: Test
-      id: test
-      run: |
-        echo "find this line"
-        echo "${{ steps.show_plan.outputs.stdout }}"
       shell: bash
     - name: Post TF Plan Comment
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable-plan-commenter == 'true' }}
@@ -119,6 +116,6 @@ runs:
         EXPAND_SUMMARY_DETAILS: "false"
       with:
         commenter_type: plan
-        commenter_input: ${{ format('{0}{1}', steps.show_plan_clean.outputs.clean_plan, steps.plan.outputs.stderr) }}
+        commenter_input: ${{ format('{0}{1}', steps.show_clean_plan.outputs.clean_plan, steps.plan.outputs.stderr) }}
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
         
