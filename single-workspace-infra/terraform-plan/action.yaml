@@ -94,7 +94,8 @@ runs:
     - name: TF Plan - Show
       id: show_plan
       run: |
-        echo "::set-output name=clean_plan::$(terraform show tfplan | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')"
+        TERRAFORM_PLAN=$(terraform show plan)
+        echo "::set-output name=clean_plan::$(echo "$TERRAFORM_PLAN" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')"
       shell: bash
     # - name: Clean Plan
     #   id: show_plan_clean
