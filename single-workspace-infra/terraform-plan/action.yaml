@@ -99,9 +99,8 @@ runs:
     - name: Clean Plan
       id: show_plan_clean
       run: |
-        echo "::set-output name=clean_plan::$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')"
-        CLEAN_PLAN=$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d') >> $GITHUB_ENV
-        echo $CLEAN_PLAN
+        CLEAN_PLAN=$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')
+        echo "::set-output name=clean_plan::$CLEAN_PLAN
       shell: bash
     - name: Test
       id: test
