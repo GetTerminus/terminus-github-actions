@@ -2,7 +2,7 @@ name: 'Terraform State Unlock'
 description: 'Unlocks the terraform state file using the lock id.'
 inputs:
   lock_id:
-    description: 'Lock id of terraform state file.'
+    description: "[lock_id] (e.g. 8b08ccb1-f514-e9c5-7271-88f5c13c3155) ID of the TF lock to unlock."
     required: true
 
 runs:
