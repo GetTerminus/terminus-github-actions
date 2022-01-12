@@ -38,7 +38,7 @@ runs:
       uses: peter-evans/find-comment@v1
       id: find_comment_fmt
       with:
-        issue-number: 1
+        issue-number: ${{ github.event.pull_request.number }}
         body-includes: Terraform `fmt` Failed
     - name: test
       run: |
