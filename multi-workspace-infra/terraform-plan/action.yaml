@@ -34,14 +34,22 @@ runs:
       uses: hashicorp/setup-terraform@v1.2.1
       with:
         terraform_version: ${{ inputs.terraform_version }}
+    - name: Find TF Format Comment if Exists
+      uses: peter-evans/find-comment@v1
+      id: find_comment_fmt
+      with:
+        issue-number: 1
+        comment-author: bot
+        body-includes: Terraform `fmt` Failed
     - name: Terraform Format Check
+      if: ${{ steps.fc.outputs.comment-id != '' }}
       id: fmt
       run: terraform fmt -check -recursive || echo "::set-output name=exitcode_continue_on_error::$?" 
       #TODO: Uncomment once github supports it
       #continue-on-error: true
       shell: bash
     - name: Post TF Format Check
-      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && steps.find_comment_fmt.outputs.comment-id != '' }}
       uses: robburger/terraform-pr-commenter@v1.5.0
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
@@ -56,10 +64,17 @@ runs:
         terraform version
         terraform init -lock=false -input=false
       shell: bash
+    - name: Find TF Init Comment if Exists
+      uses: peter-evans/find-comment@v1
+      id: find_comment_init
+      with:
+        issue-number: 1
+        comment-author: bot
+        body-includes: Terraform `init` Failed
     - name: Post TF Init Comment
       # TODO: Add in the below code to all plan commenter if statements when github adds in the functionality
       # (steps.init.outcome == 'success' || steps.init.outcome == 'failure')
-      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && steps.find_comment_init.outputs.comment-id != '' }}
       uses: robburger/terraform-pr-commenter@v1.5.0
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
@@ -80,8 +95,15 @@ runs:
         terraform validate
         terraform workspace show
       shell: bash
+    - name: Find TF Validat Comment if Exists
+      uses: peter-evans/find-comment@v1
+      id: find_comment_validate
+      with:
+        issue-number: 1
+        comment-author: bot
+        body-includes: Terraform `validate` Failed
     - name: Post TF Validate Comment
-      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && steps.find_comment_validate.outputs.comment-id != '' }}
       uses: robburger/terraform-pr-commenter@v1.5.0
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
