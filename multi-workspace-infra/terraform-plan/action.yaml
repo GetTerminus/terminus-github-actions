@@ -48,7 +48,7 @@ runs:
         echo ${{ steps.find_comment_fmt.outputs.comment-author }}
       shell: bash
     - name: Terraform Format Check
-      if: ${{ steps.find_comment_fmt.outputs.comment-id != '' }}
+      if: ${{ steps.find_comment_fmt.outputs.comment-id == '' }}
       id: fmt
       run: terraform fmt -check -recursive || echo "::set-output name=exitcode_continue_on_error::$?" 
       #TODO: Uncomment once github supports it
