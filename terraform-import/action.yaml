@@ -1,16 +1,22 @@
 name: 'Terraform Import'
 description: 'Runs terraform import using resource id and resource name.'
 inputs:
+  ssh_key:
+    description: '[secret] [required] GitHub SSH Key for pulling repo.'
+    required: true
+  terraform_version:
+    description: '[decimal] [required] (i.e. 1.0.11) Terraform version to use.'
+    required: true
   resource_id:
-    description: "[resource_id] (i.e. 45188095) ID of the TF Resource being imported."
+    description: "[resource_id] [required] (i.e. 45188095) ID of the TF Resource being imported."
     required: true
   resource_name:
-    description: "[resource_name] (i.e. datadog_monitor.platform-browser-identity-status). Type and name of the resource that will be in your TF File in dot notation."
+    description: "[resource_name] [required] (i.e. datadog_monitor.platform-browser-identity-status). Type and name of the resource that will be in your TF File in dot notation."
     required: true
   dry_run:
-    description: "[dry_run] (y/n). If you wish to skip updating the TF State File."
+    description: "[dry_run] [required] (i.e. true/false). If you wish to skip updating the TF State File."
     required: true
-    default: "y"
+    default: "true"
 
 runs:
   using: "composite"
@@ -18,20 +24,20 @@ runs:
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
       with:
-        ssh-private-key: ${{ env.GH_ACTIONS_SSH_PRIVATE_KEY }}
+        ssh-private-key: ${{ inputs.ssh_key }}
     - name: Pull
       uses: actions/checkout@v2
     - name: HashiCorp - Setup Terraform
       uses: hashicorp/setup-terraform@v1.2.1
       with:
-        terraform_version: ${{ env.TERRAFORM_VERSION }}
+        terraform_version: ${{ inputs.terraform_version }}
     - name: Initialize Terraform
       run: |
         terraform version
         terraform init -lock=false -input=false
       shell: bash
     - name: Dry Run
-      if: ${{ inputs.dry_run == 'y' }}
+      if: ${{ inputs.dry_run == 'true' }}
       run: |
         RED='\033[0;31m'
         NC='\033[0m'

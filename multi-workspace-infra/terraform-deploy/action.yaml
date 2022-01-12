@@ -1,8 +1,8 @@
 name: 'Terraform Deploy - Multiple Workspaces'
 description: 'Triggers a deployment of all environments.'
 inputs:
-  gh-deployment-access-token:
-    description: 'Github deployment access token.'
+  gh_deployment_access_token:
+    description: '[secret] GitHub deployment access token.'
     required: true
 runs:
   using: "composite"
@@ -10,5 +10,5 @@ runs:
   - name: Create Sequential Deployments
     uses: chrnorm/deployment-action@releases/v1
     with:
-      token: ${{ inputs.gh-deployment-access-token }}
+      token: ${{ inputs.gh_deployment_access_token }}
       environment: all
