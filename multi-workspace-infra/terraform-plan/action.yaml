@@ -39,12 +39,11 @@ runs:
       id: find_comment_fmt
       with:
         issue-number: ${{ github.event.pull_request.number }}
+        comment-author: github-actions[bot]
         body-includes: Terraform `fmt` Failed
     - name: test
       run: |
         echo ${{ steps.find_comment_fmt.outputs.comment-id }}
-        echo ${{ steps.find_comment_fmt.outputs.comment-body }}
-        echo ${{ steps.find_comment_fmt.outputs.comment-author }}
       shell: bash
     - name: Terraform Format Check
       if: ${{ steps.find_comment_fmt.outputs.comment-id == '' }}
