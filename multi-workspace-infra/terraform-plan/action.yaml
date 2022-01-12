@@ -39,7 +39,6 @@ runs:
       id: find_comment_fmt
       with:
         issue-number: 1
-        comment-author: bot
         body-includes: Terraform `fmt` Failed
     - name: test
       run: |
