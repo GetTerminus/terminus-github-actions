@@ -33,10 +33,22 @@ runs:
       uses: actions/checkout@v2
       with:
         ref: ${{ github.event.deployment.ref }}
-    # - name: Upload Git MetaData to Datadog
-    #   run: |
-    #     datadog-ci git-metadata upload
-    #   shell: bash
+    - name: Upload Git MetaData to Datadog
+      run: |
+        if [ -z "${DATADOG_API_KEY}" ] && [ ! -z ${TF_VAR_eks_datadog_api_key} ]
+        then
+          echo "DATADOG_API_KEY empty setting to TF_VAR_eks_datadog_api_key"
+          export DATADOG_API_KEY=${TF_VAR_eks_datadog_api_key}
+        fi
+        if [ -z "${DATADOG_API_KEY}" ] && [ -z ${TF_VAR_eks_datadog_api_key} ]
+        then
+          echo -e "\033[33mDATADOG_API_KEY and TF_VAR_eks_datadog_api_key are EMPTY one is required to run datadog-ci git-metadata upload. Skipping ...\033[0m"
+        fi
+        if [ ! -z "${DATADOG_API_KEY}" ]
+        then
+          datadog-ci git-metadata upload
+        fi
+      shell: bash
     - name: Deployment Pending
       uses: deliverybot/deployment-status@v1
       with:
