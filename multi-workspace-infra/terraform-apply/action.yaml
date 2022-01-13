@@ -33,10 +33,10 @@ runs:
       uses: actions/checkout@v2
       with:
         ref: ${{ github.event.deployment.ref }}
-    - name: Upload Git MetaData to Datadog
-      run: |
-        datadog-ci git-metadata upload
-      shell: bash
+    # - name: Upload Git MetaData to Datadog
+    #   run: |
+    #     datadog-ci git-metadata upload
+    #   shell: bash
     - name: Deployment Pending
       uses: deliverybot/deployment-status@v1
       with:

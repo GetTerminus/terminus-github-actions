@@ -37,7 +37,6 @@ runs:
     - name: Terraform Format Check
       id: fmt
       run: |
-        echo "${*datadog_api*}"
         terraform fmt -check -recursive || echo "::set-output name=exitcode_continue_on_error::$?" 
       #TODO: Uncomment once github supports it
       #continue-on-error: true
