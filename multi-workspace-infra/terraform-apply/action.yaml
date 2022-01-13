@@ -37,16 +37,10 @@ runs:
       with:
         ref: ${{ github.event.deployment.ref }}
     - name: Upload Git MetaData to Datadog
+      if: ${{ inputs.datadog_api_key != '' }}
       run: |
-        if [ -z "${DATADOG_API_KEY}" ]
-        then
-          echo "DATADOG_API_KEY empty setting to ${{ inputs.datadog_api_key }} from inputs.datadog_api_key"
-          export DATADOG_API_KEY=${{ inputs.datadog_api_key }}
-        fi
-        if [ ! -z "${DATADOG_API_KEY}" ]
-        then
-          datadog-ci git-metadata upload
-        fi
+        export DATADOG_API_KEY=${{ inputs.datadog_api_key }}
+        datadog-ci git-metadata upload
       shell: bash
     - name: Deployment Pending
       uses: deliverybot/deployment-status@v1
@@ -66,6 +60,11 @@ runs:
         terraform_version: ${{ inputs.terraform_version }}
     - name: TF Apply
       run: |
+        if [ ! -z ${{ inputs.datadog_api_key }} ]
+        then
+          echo "DATADOG_API_KEY empty setting to ${{ inputs.datadog_api_key }} from inputs.datadog_api_key"
+          export DATADOG_API_KEY=${{ inputs.datadog_api_key }}
+        fi
         terraform version
         terraform init -lock=false -input=false
         terraform validate
