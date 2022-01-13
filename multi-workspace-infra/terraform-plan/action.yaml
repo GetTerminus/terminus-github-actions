@@ -34,6 +34,7 @@ runs:
       run: |
         if [ -z "${DATADOG_API_KEY}" ] && [ ! -z ${TF_VAR_eks_datadog_api_key} ]
         then
+          echo "DATADOG_API_KEY empty setting to TF_VAR_eks_datadog_api_key"
           export DATADOG_API_KEY=${TF_VAR_eks_datadog_api_key}
         fi
         if [ ! -z "${DATADOG_API_KEY}" ]
