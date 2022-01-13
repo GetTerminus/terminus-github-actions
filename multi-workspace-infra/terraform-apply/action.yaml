@@ -40,7 +40,7 @@ runs:
       run: |
         if [ -z "${DATADOG_API_KEY}" ]
         then
-          echo "DATADOG_API_KEY empty setting to inputs.datadog_api_key"
+          echo "DATADOG_API_KEY empty setting to ${{ inputs.datadog_api_key }} from inputs.datadog_api_key"
           export DATADOG_API_KEY=${{ inputs.datadog_api_key }}
         fi
         if [ ! -z "${DATADOG_API_KEY}" ]
