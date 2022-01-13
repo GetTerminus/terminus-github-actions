@@ -17,6 +17,9 @@ inputs:
   artifactory_helm_chart_path:
     description: '[string] Path to helm chart for artifactory.'
     required: false
+  datadog_api_key:
+    description: '[secret] DataDog API Key. Required for the git-metadata upload if DATADOG_API_KEY is empty.'
+    required: false
 
 runs:
   using: "composite"
@@ -35,18 +38,20 @@ runs:
         ref: ${{ github.event.deployment.ref }}
     - name: Upload Git MetaData to Datadog
       run: |
-        if [ -z "${DATADOG_API_KEY}" ] && [ ! -z ${TF_VAR_eks_datadog_api_key} ]
+        if [ ! -z "${DATADOG_API_KEY}" ] || [ ! -z ${{ inputs.datadog_api_key }} ]
         then
-          echo "DATADOG_API_KEY empty setting to TF_VAR_eks_datadog_api_key"
-          export DATADOG_API_KEY=${TF_VAR_eks_datadog_api_key}
-        fi
-        if [ -z "${DATADOG_API_KEY}" ] && [ -z ${TF_VAR_eks_datadog_api_key} ]
-        then
-          echo -e "\033[33mDATADOG_API_KEY and TF_VAR_eks_datadog_api_key are EMPTY one is required to run datadog-ci git-metadata upload. Skipping ...\033[0m"
-        fi
-        if [ ! -z "${DATADOG_API_KEY}" ]
-        then
+          if [ -z "${DATADOG_API_KEY}" ]
+          then
+            echo "DATADOG_API_KEY empty setting to inputs.datadog_api_key"
+            export DATADOG_API_KEY=${TF_VAR_eks_datadog_api_key}
+          fi
           datadog-ci git-metadata upload
+        fi
+        if [ -z "${DATADOG_API_KEY}" ] && [ -z ${{ inputs.datadog_api_key }} ]
+        then
+          echo ""
+          echo -e "\033[33mDATADOG_API_KEY is EMPTY, set datadog_api_key action input run datadog-ci git-metadata upload. Skipping ...\033[0m"
+          echo ""
         fi
       shell: bash
     - name: Deployment Pending
