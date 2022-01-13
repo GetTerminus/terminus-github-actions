@@ -38,20 +38,14 @@ runs:
         ref: ${{ github.event.deployment.ref }}
     - name: Upload Git MetaData to Datadog
       run: |
-        if [ ! -z "${DATADOG_API_KEY}" ] || [ ! -z ${{ inputs.datadog_api_key }} ]
+        if [ -z "${DATADOG_API_KEY}" ]
         then
-          if [ -z "${DATADOG_API_KEY}" ]
-          then
-            echo "DATADOG_API_KEY empty setting to inputs.datadog_api_key"
-            export DATADOG_API_KEY=${TF_VAR_eks_datadog_api_key}
-          fi
-          datadog-ci git-metadata upload
+          echo "DATADOG_API_KEY empty setting to inputs.datadog_api_key"
+          export DATADOG_API_KEY=${{ inputs.datadog_api_key }}
         fi
-        if [ -z "${DATADOG_API_KEY}" ] && [ -z ${{ inputs.datadog_api_key }} ]
+        if [ ! -z "${DATADOG_API_KEY}" ]
         then
-          echo ""
-          echo -e "\033[33mDATADOG_API_KEY is EMPTY, set datadog_api_key action input run datadog-ci git-metadata upload. Skipping ...\033[0m"
-          echo ""
+          datadog-ci git-metadata upload
         fi
       shell: bash
     - name: Deployment Pending
