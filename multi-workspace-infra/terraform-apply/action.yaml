@@ -62,7 +62,7 @@ runs:
       run: |
         if [ ! -z ${{ inputs.datadog_api_key }} ]
         then
-          echo "DATADOG_API_KEY empty setting to ${{ inputs.datadog_api_key }} from inputs.datadog_api_key"
+          echo "Setting DATADOG_API_KEY to ${{ inputs.datadog_api_key }} from inputs.datadog_api_key"
           export DATADOG_API_KEY=${{ inputs.datadog_api_key }}
         fi
         terraform version
