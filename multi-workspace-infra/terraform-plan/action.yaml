@@ -21,6 +21,10 @@ inputs:
                   removed after.'
     required: false
     default: 'false'
+  datadog_api_key:
+    description: '[secret] DataDog API Key. Required for the git-metadata upload if DATADOG_API_KEY is empty.'
+    required: false
+    
 runs:
   using: "composite"
   steps:
@@ -39,11 +43,11 @@ runs:
             echo "DATADOG_API_KEY empty setting to inputs.datadog_api_key"
             export DATADOG_API_KEY=${TF_VAR_eks_datadog_api_key}
           fi
-          echo "datadog-ci git-metadata upload"
+          echo "datadog-ci git-metadata upload" 
         fi
         if [ -z "${DATADOG_API_KEY}" ] && [ -z ${{ inputs.datadog_api_key }} ]
         then
-          echo -e "\033[33m \nDATADOG_API_KEY is EMPTY, set datadog_api_key action input run datadog-ci git-metadata upload. Skipping ...\n \033[0m"
+          echo -e "\033[33mDATADOG_API_KEY is EMPTY, set datadog_api_key action input run datadog-ci git-metadata upload. Skipping ...\033[0m"
         fi
       shell: bash
     - name: HashiCorp - Setup Terraform
