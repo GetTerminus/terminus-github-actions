@@ -18,7 +18,7 @@ inputs:
     description: '[string] Path to helm chart for artifactory.'
     required: false
   datadog_api_key:
-    description: '[secret] DataDog API Key. Required for the git-metadata upload if DATADOG_API_KEY is empty.'
+    description: '[secret] DataDog API Key. Required for the git-metadata upload.'
     required: false
 
 runs:
