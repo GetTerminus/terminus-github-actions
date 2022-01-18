@@ -61,7 +61,7 @@ runs:
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
       uses: robburger/terraform-pr-commenter@v1.5.0
       env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
         EXPAND_SUMMARY_DETAILS: "false"
       with:
         commenter_type: init
