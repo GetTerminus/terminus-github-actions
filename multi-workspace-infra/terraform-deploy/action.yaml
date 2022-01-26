@@ -12,3 +12,4 @@ runs:
     with:
       token: ${{ inputs.gh_deployment_access_token }}
       environment: all
+      use_delivery_bot: true
