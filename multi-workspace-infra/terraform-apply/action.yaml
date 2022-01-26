@@ -20,6 +20,9 @@ inputs:
   datadog_api_key:
     description: '[secret] DataDog API Key. Required for the git-metadata upload.'
     required: false
+  deployment_token:
+    description: '[secret] Authentication token used for the github delivery bot deployment status.'
+    required: false
 
 runs:
   using: "composite"
