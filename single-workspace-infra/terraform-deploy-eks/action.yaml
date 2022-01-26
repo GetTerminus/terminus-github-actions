@@ -13,6 +13,6 @@ runs:
       workflow: Terraform Apply
       token: ${{ inputs.pull_access_token }}
       repo: GetTerminus/eks-infra
-      ref: main
-      inputs: '{"environment": "all"}'
+      ref: master
+      inputs: '{"environment": "all", "use_delivery_bot": "false"}'
       

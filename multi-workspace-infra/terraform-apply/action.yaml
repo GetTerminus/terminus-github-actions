@@ -20,8 +20,8 @@ inputs:
   datadog_api_key:
     description: '[secret] DataDog API Key. Required for the git-metadata upload.'
     required: false
-  deployment_token:
-    description: '[secret] Authentication token used for the github delivery bot deployment status.'
+  use_delivery_bot:
+    description: '[bool] (i.e. true/false) Whether or not to run the delivery bot deployment status steps.'
     required: false
 
 runs:
@@ -46,10 +46,11 @@ runs:
         datadog-ci git-metadata upload
       shell: bash
     - name: Deployment Pending
+      if:  ${{ inputs.use_delivery_bot == 'true' }}
       uses: deliverybot/deployment-status@v1
       with:
         state: pending
-        token: ${{ inputs.deployment_token }}
+        token: ${{ github.token }}
     - name: Helm Update
       if: ${{ inputs.artifactory_enabled == 'true' }}
       run: |
@@ -76,15 +77,15 @@ runs:
         terraform apply -lock=true -lock-timeout=0s -input=false tfplan
       shell: bash
     - name: Deployment Success
-      if: success()
+      if: ${{ success() && inputs.use_delivery_bot == 'true' }}
       uses: deliverybot/deployment-status@v1
       with:
         state: success
-        token: ${{ inputs.deployment_token }}
+        token: ${{ github.token }}
     - name: Deployment Failure
-      if: failure()
+      if: ${{ failure() && inputs.use_delivery_bot == 'true' }}
       uses: deliverybot/deployment-status@v1
       with:
         state: failure
-        token: ${{ inputs.deployment_token }}
+        token: ${{ github.token }}
       
