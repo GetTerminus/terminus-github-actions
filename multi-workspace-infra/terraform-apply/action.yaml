@@ -46,7 +46,7 @@ runs:
       uses: deliverybot/deployment-status@v1
       with:
         state: pending
-        token: ${{ github.token }}
+        token: ${{ secrets.GH_DEPLOYMENT_ACCESS_TOKEN }}
     - name: Helm Update
       if: ${{ inputs.artifactory_enabled == 'true' }}
       run: |
@@ -77,7 +77,7 @@ runs:
       uses: deliverybot/deployment-status@v1
       with:
         state: success
-        token: ${{ github.token }}
+        token: ${{ secrets.GH_DEPLOYMENT_ACCESS_TOKEN }}
     - name: Deployment Failure
       if: failure()
       uses: deliverybot/deployment-status@v1
