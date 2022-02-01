@@ -69,13 +69,6 @@ runs:
         commenter_type: fmt
         commenter_input: ${{ format('{0}{1}', steps.fmt.outputs.stdout, steps.fmt.outputs.stderr) }}
         commenter_exitcode: ${{ steps.fmt.outputs.exitcode }}
-    - name: Helm Update
-      if: ${{ inputs.artifactory_enabled == 'true' }}
-      run: |
-        helm repo add terminus https://getterminus.jfrog.io/artifactory/default-helm/ --username developer --password ${{ inputs.artifactory_read_access_token }}
-        helm repo update
-        helm dependency update ${{ inputs.artifactory_helm_chart_path }}
-      shell: bash
     - name: TF Plan - Initialize
       id: init
       run: |
