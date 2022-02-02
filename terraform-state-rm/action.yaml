@@ -46,3 +46,4 @@ runs:
     - name: Print dry_run
       run: |
         echo ${{ inputs.dry_run }}
+      shell: bash
