@@ -31,7 +31,7 @@ runs:
     - name: Initialize Terraform
       run: |
         terraform version
-        terraform init -lock=false -input=false
+        terraform init -lock=false
       shell: bash
     - name: Dry Run
       if: ${{ inputs.dry_run == 'true' }}
