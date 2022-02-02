@@ -31,15 +31,15 @@ runs:
     - name: Initialize Terraform
       run: |
         terraform version
-        terraform init -lock=false -input=false
+        terraform init -lock=false
       shell: bash
     - name: Dry Run
       if: ${{ inputs.dry_run == 'true' }}
       run: |
-        terraform state rm -dry-run -input=false ${{ inputs.resource_address }}
+        terraform state rm -dry-run ${{ inputs.resource_address }}
       shell: bash
-    - name: Update Terraform State File - If dry_run == 'n'
-      if: ${{ inputs.dry_run == 'n' }}
+    - name: Update Terraform State File - If dry_run == 'false'
+      if: ${{ inputs.dry_run == 'false' }}
       run: |
-        terraform state rm -input=false ${{ inputs.resource_address }}
+        terraform state rm ${{ inputs.resource_address }}
       shell: bash
