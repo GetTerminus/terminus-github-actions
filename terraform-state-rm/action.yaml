@@ -39,7 +39,7 @@ runs:
         terraform state rm -dry-run ${{ inputs.resource_address }}
       shell: bash
     - name: Update Terraform State File - If dry_run == 'n'
-      if: ${{ inputs.dry_run == 'n' }}
+      if: ${{ inputs.dry_run == 'false' }}
       run: |
         terraform state rm ${{ inputs.resource_address }}
       shell: bash
