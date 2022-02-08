@@ -40,9 +40,6 @@ runs:
       with:
         ref: ${{ github.event.deployment.ref }}
         lfs: true
-    - name: Checkout LFS objects
-      run: git lfs checkout
-      uses: actions/checkout@v2
     - name: Upload Git MetaData to Datadog
       if: ${{ inputs.datadog_api_key != '' }}
       run: |

@@ -43,9 +43,6 @@ runs:
       uses: actions/checkout@v2
       with:
         lfs: true
-    - name: Checkout LFS objects
-      run: git lfs checkout
-      uses: actions/checkout@v2
     - name: Helm Update
       if: ${{ inputs.artifactory_enabled == 'true' }}
       run: |
