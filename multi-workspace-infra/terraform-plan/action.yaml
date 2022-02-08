@@ -31,6 +31,9 @@ inputs:
                   removed after.'
     required: false
     default: 'false'
+  tf_workspace:
+    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if initial_run input = true.'
+    required: false
     
 runs:
   using: "composite"
@@ -92,8 +95,8 @@ runs:
     - name: TF Plan - Create Workspace
       if: ${{ inputs.initial_run == 'true' }}
       run: |
-        terraform workspace new ${{ env.TF_WORKSPACE }}
-        terraform workspace select ${{ env.TF_WORKSPACE }}
+        terraform workspace new ${{ inputs.tf_workspace }}
+        terraform workspace select ${{ inputs.tf_workspace }}
       shell: bash
     - name: TF Plan - Validate
       id: validate
