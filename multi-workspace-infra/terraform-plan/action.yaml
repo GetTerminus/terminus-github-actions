@@ -97,6 +97,7 @@ runs:
       run: |
         terraform workspace new ${{ inputs.tf_workspace }}
         terraform workspace select ${{ inputs.tf_workspace }}
+        export TF_WORKSPACE=${{ inputs.tf_workspace }}
       shell: bash
     - name: TF Plan - Validate
       id: validate
