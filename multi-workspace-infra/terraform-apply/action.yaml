@@ -7,6 +7,9 @@ inputs:
   terraform_version:
     description: '[decimal] (i.e. 1.0.11) Terraform version to use.'
     required: true
+  tf_workspace:
+    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if initial_run input = true.'
+    required: true
   artifactory_enabled:
     description: '[bool] (i.e. true/false) Whether or not the repo uses artifactory for the helm chart.'
     default: 'false'
@@ -73,8 +76,9 @@ runs:
         terraform version
         terraform init -lock=false -input=false
         terraform validate
+        terraform workspace select ${{ inputs.tf_workspace }}
         terraform workspace show
-        terraform plan -var-file=vars/$TF_WORKSPACE.tfvars -lock=true -lock-timeout=0s -input=false -out=tfplan .
+        terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=true -lock-timeout=0s -input=false -out=tfplan .
         terraform apply -lock=true -lock-timeout=0s -input=false tfplan
       shell: bash
     - name: Deployment Success

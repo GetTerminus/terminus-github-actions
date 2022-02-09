@@ -7,6 +7,9 @@ inputs:
   terraform_version:
     description: '[decimal] (i.e. 1.0.11) Terraform version to use.'
     required: true
+  tf_workspace:
+    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if initial_run input = true.'
+    required: true
   artifactory_enabled:
     description: '[bool] (i.e. true/false) Whether or not the repo uses artifactory for the helm chart.'
     default: 'false'
@@ -26,14 +29,11 @@ inputs:
     default: 'true'
   initial_run:
     description: '[bool] (i.e. true/false) If set to true, workspace will be
-                  created based on TF_WORKSPACE. This should only be run when
+                  created based on tf_workspace input variable. This should only be run when
                   creating the repo and running the plan for the first time and
                   removed after.'
     required: false
     default: 'false'
-  tf_workspace:
-    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if initial_run input = true.'
-    required: false
     
 runs:
   using: "composite"
@@ -92,12 +92,16 @@ runs:
         commenter_type: init
         commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
         commenter_exitcode: ${{ steps.init.outputs.exitcode }}
+    - name: TF Plan - Select Workspace
+      if: ${{ inputs.initial_run != 'true' }}
+      run: |
+        terraform workspace select ${{ inputs.tf_workspace }}
+      shell: bash
     - name: TF Plan - Create Workspace
       if: ${{ inputs.initial_run == 'true' }}
       run: |
         terraform workspace new ${{ inputs.tf_workspace }}
         terraform workspace select ${{ inputs.tf_workspace }}
-        export TF_WORKSPACE=${{ inputs.tf_workspace }}
       shell: bash
     - name: TF Plan - Validate
       id: validate
@@ -118,7 +122,7 @@ runs:
     - name: TF Plan - Run
       id: plan
       run: |
-        terraform plan -var-file=vars/$TF_WORKSPACE.tfvars -lock=false -input=false -out=tfplan
+        terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=false -input=false -out=tfplan
       shell: bash
     - name: TF Plan - Show
       id: show_plan
