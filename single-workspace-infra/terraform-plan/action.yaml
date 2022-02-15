@@ -100,6 +100,7 @@ runs:
         terraform show tfplan
       shell: bash
     - name: Clean Plan
+      if: ${{ inputs.enable_plan_commenter == 'true' }}
       id: clean_plan
       run: |
         CLEAN_PLAN=$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')
