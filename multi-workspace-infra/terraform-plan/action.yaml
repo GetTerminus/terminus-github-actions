@@ -138,6 +138,6 @@ runs:
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
       with:
         commenter_type: plan
-        commenter_input: ${{ format('{0}{1}', steps.show_plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        commenter_input: tfplan
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
         
