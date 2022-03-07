@@ -8,7 +8,7 @@ inputs:
     description: '[decimal] (i.e. 1.0.11) Terraform version to use.'
     required: true
   tf_workspace:
-    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if initial_run input = true.'
+    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if tf_create_workspace input = true.'
     required: true
   artifactory_enabled:
     description: '[bool] (i.e. true/false) Whether or not the repo uses artifactory for the helm chart.'

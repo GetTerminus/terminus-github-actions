@@ -8,7 +8,7 @@ inputs:
     description: '[decimal] (i.e. 1.0.11) Terraform version to use.'
     required: true
   tf_workspace:
-    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if initial_run input = true.'
+    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if tf_create_workspace input = true.'
     required: true
   artifactory_enabled:
     description: '[bool] (i.e. true/false) Whether or not the repo uses artifactory for the helm chart.'
@@ -27,7 +27,7 @@ inputs:
     description: '[bool] (i.e. true/false) Enable the tf plan commenter.'
     required: false
     default: 'true'
-  initial_run:
+  tf_create_workspace:
     description: '[bool] (i.e. true/false) If set to true, workspace will be
                   created based on tf_workspace input variable. This should only be run when
                   creating the repo and running the plan for the first time and
@@ -95,12 +95,12 @@ runs:
         commenter_exitcode: ${{ steps.init.outputs.exitcode }}
         terraform_version: ${{ inputs.terraform_version }}
     - name: TF Plan - Select Workspace
-      if: ${{ inputs.initial_run != 'true' }}
+      if: ${{ inputs.tf_create_workspace != 'true' }}
       run: |
         terraform workspace select ${{ inputs.tf_workspace }}
       shell: bash
     - name: TF Plan - Create Workspace
-      if: ${{ inputs.initial_run == 'true' }}
+      if: ${{ inputs.tf_create_workspace == 'true' }}
       run: |
         terraform workspace new ${{ inputs.tf_workspace }}
         terraform workspace select ${{ inputs.tf_workspace }}
