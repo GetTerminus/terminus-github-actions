@@ -78,7 +78,7 @@ runs:
         terraform validate
         terraform workspace select ${{ inputs.tf_workspace }}
         terraform workspace show
-        terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=true -lock-timeout=0s -input=false -out=tfplan .
+        terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=true -lock-timeout=0s -input=false -out=tfplan
         terraform apply -lock=true -lock-timeout=0s -input=false tfplan
       shell: bash
     - name: Deployment Success
