@@ -20,7 +20,7 @@ runs:
       with:
         lfs: true
     - name: package_spark_lib
-      uses: ${{ inputs.spark_lib_image }}
+      uses: docker://getterminus/scala-sbt-ci-image:${{ inputs.spark_lib_image }}
       with:
         args: bash -c "cd spark-lib && sbt test"
         
