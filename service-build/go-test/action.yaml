@@ -7,9 +7,6 @@ inputs:
   go_version:
     description: '[string] GO version for build and test.'
     required: true
-  cmd_to_build:
-    description: '[string] cmd to build.'
-    required: true
   dynamo_test_endpoint:
     description: '[string] dynamo_test_endpoint.'
     required: true
