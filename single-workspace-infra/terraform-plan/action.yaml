@@ -101,9 +101,9 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         EXPAND_SUMMARY_DETAILS: "false"
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
-        with:
-          commenter_type: plan
-          commenter_input: tfplan
-          commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
-          terraform_version: ${{ inputs.terraform_version }}
+      with:
+        commenter_type: plan
+        commenter_input: tfplan
+        commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+        terraform_version: ${{ inputs.terraform_version }}
         
