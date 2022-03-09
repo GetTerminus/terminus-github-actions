@@ -4,6 +4,9 @@ inputs:
   ssh_key:
     description: '[secret] GitHub SSH Key for pulling repo.'
     required: true
+  spark_lib_image:
+    description: '[string] source of the spark lib package docker image.'
+    required: true
   spark_scala_file:
     description: '[string] Filename for spark scala file found in src/main/scala/'
     required: true
@@ -20,7 +23,7 @@ runs:
       with:
         lfs: true
     - name: package_spark_lib
-      uses: docker://getterminus/scala-sbt-ci-image:20200221
+      uses: ${{ inputs.spark_lib_image }}
       with:
         args: bash -c "cd spark-lib && sbt assembly"
     - run: |
