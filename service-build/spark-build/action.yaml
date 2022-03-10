@@ -17,9 +17,9 @@ runs:
   using: "composite"
   steps:
     - name: Validate Inputs
-      uses: ./shell-scripts/input-validator.sh
       run: |
-        
+        source ${{ github.action_path }}/shell-scripts/input-validator.sh
+        inputs="${inputs.ssh_key} ${inputs.spark_lib_image} ${inputs.spark_scala_file}"
         validateInput "${inputs[@]}"
       shell: bash
     - name: Install SSH Key
