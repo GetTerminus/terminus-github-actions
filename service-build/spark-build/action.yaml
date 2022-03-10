@@ -36,7 +36,7 @@ runs:
         fi
         if [ ! -z "$error_message" ]
         then
-          echo "$RED $error_message"
+          echo -e "$RED $error_message"
           exit 1
         fi
       shell: bash
