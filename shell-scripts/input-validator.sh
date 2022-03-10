@@ -11,9 +11,9 @@ info () {
 function validateInput() {
    local -n arr=$1
    error_count=0
-   for key in ${!arr[@]};
+   for key in ${arr[@]};
       do
-        if [ -z "$i" ]
+        if [ -z "$val" ]
         then
           error_count=$((error_count+1))
           error "${key} is empty."
