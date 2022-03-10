@@ -35,7 +35,8 @@ runs:
         fi
         if [ ! -z "$error_message" ]
         then
-          { tput setaf 1; echo "$error_message"; exit 1; }
+          echo "$(tput setaf 1)$error_message"
+          exit 1
         fi
       shell: bash
     - name: Install SSH Key
