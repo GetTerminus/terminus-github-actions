@@ -7,10 +7,22 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Create Sequential Deployments
-    uses: chrnorm/deployment-action@releases/v1
-    with:
-      token: ${{ inputs.gh_deployment_access_token }}
-      environment: all
-      use_delivery_bot: true
+    - name: Validate Inputs
+      env:
+        GH_DEPLOYMENT_ACCESS_TOKEN: ${{ inputs.gh_deployment_access_token }}
+      run: |
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+        
+        declare -A inputs
+        inputs[gh_deployment_access_token]="$GH_DEPLOYMENT_ACCESS_TOKEN"
+        
+        validateInput inputs
+      shell: bash
+    - name: Create Sequential Deployments
+      uses: chrnorm/deployment-action@releases/v1
+      with:
+        token: ${{ inputs.gh_deployment_access_token }}
+        environment: all
+        use_delivery_bot: true
       

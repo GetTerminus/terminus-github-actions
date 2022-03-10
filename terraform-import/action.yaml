@@ -21,6 +21,26 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Validate Inputs
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+        TERRAFORM_VERSION: ${{ inputs.terraform_version }}
+        RESOURCE_ID: ${{ inputs.resource_id }}
+        RESOURCE_NAME: ${{ inputs.resource_name }}
+        DRY_RUN: ${{ inputs.dry_run }}
+      run: |
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+        
+        declare -A inputs
+        inputs[terraform_version]="$TERRAFORM_VERSION"
+        inputs[tf_workspace]="$TF_WORKSPACE"
+        inputs[resource_id]="$RESOURCE_ID"
+        inputs[resource_name]="$RESOURCE_NAME"
+        inputs[dry_run]="$DRY_RUN"
+        
+        validateInput inputs
+      shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
       with:

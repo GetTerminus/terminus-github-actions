@@ -17,6 +17,24 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Validate Inputs
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+        GO_VERSION: ${{ inputs.go_version }}
+        DYNAMO_TEST_ENDPOINT: ${{ inputs.dynamo_test_endpoint }}
+        COVERALLS_TOKEN: ${{ inputs.coveralls_token }}
+      run: |
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+        
+        declare -A inputs
+        inputs[ssh_key]="$SSH_KEY"
+        inputs[go_version]="$GO_VERSION"
+        inputs[dynamo_test_endpoint]="$DYNAMO_TEST_ENDPOINT"
+        inputs[coveralls_token]="$COVERALLS_TOKEN"
+        
+        validateInput inputs
+      shell: bash
     - name: Set Environmental Variables
       run: |
         echo "GOPRIVATE=github.com/GetTerminus/*" >> $GITHUB_ENV

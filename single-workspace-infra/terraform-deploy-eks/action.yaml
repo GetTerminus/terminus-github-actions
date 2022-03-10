@@ -7,12 +7,24 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Deploy EKS Infra
-    uses: benc-uk/workflow-dispatch@v1
-    with:
-      workflow: Terraform Apply
-      token: ${{ inputs.pull_access_token }}
-      repo: GetTerminus/eks-infra
-      ref: master
-      inputs: '{"environment": "all", "use_delivery_bot": "false"}'
+    - name: Validate Inputs
+      env:
+        PULL_ACCESS_TOKEN: ${{ inputs.pull_access_token }}
+      run: |
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+        
+        declare -A inputs
+        inputs[pull_access_token]="$PULL_ACCESS_TOKEN"
+        
+        validateInput inputs
+      shell: bash
+    - name: Deploy EKS Infra
+      uses: benc-uk/workflow-dispatch@v1
+      with:
+        workflow: Terraform Apply
+        token: ${{ inputs.pull_access_token }}
+        repo: GetTerminus/eks-infra
+        ref: master
+        inputs: '{"environment": "all", "use_delivery_bot": "false"}'
       

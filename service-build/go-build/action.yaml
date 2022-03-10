@@ -14,6 +14,22 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Validate Inputs
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+        GO_VERSION: ${{ inputs.go_version }}
+        CMD_TO_BUILD: ${{ inputs.cmd_to_build }}
+      run: |
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+        
+        declare -A inputs
+        inputs[ssh_key]="$SSH_KEY"
+        inputs[go_version]="$GO_VERSION"
+        inputs[cmd_to_build]="$CMD_TO_BUILD"
+        
+        validateInput inputs
+      shell: bash
     - name: Set Environmental Variables
       run: |
         echo "GOPRIVATE=github.com/GetTerminus/*" >> $GITHUB_ENV

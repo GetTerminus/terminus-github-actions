@@ -15,7 +15,7 @@ error () {
 }
 
 success () {
-  echo -e "\033[32;1mERROR:\033[0m $1"
+  echo -e "\033[32;SUCCESS:\033[0m $1"
 }
 
 info () {
