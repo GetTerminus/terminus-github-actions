@@ -16,10 +16,27 @@ runs:
   steps:
     - name: Validate Inputs
       run: |
-        for item in ${{ inputs }}
-        do
-          echo "${item}"
-        done
+        error_message=""
+        if [ -z "${{ inputs.ssh_key }}" ]
+        then
+          error_message="${error_message}\ssh_key is NULL."
+          error_message="${error_message}\ssh_key description: ${{ inputs.ssh_key.description }}"
+        fi
+        if [ -z "${{ inputs.spark_lib_image }}" ]
+        then
+          error_message="${error_message}\spark_lib_image is NULL."
+          error_message="${error_message}\spark_lib_image description: ${{ inputs.spark_lib_image.description }}"
+        fi
+        if [ -z "${{ inputs.spark_scala_file }}" ]
+        then
+          error_message="${error_message}\spark_scala_file is NULL."
+          error_message="${error_message}\spark_scala_file description: ${{ inputs.spark_scala_file.description }}"
+        fi
+        if [ ! -z "$error_message" ]
+        then
+          echo "$error_message" >/dev/stderr
+          exit 1
+        fi
       shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
@@ -29,24 +46,24 @@ runs:
       uses: actions/checkout@v2
       with:
         lfs: true
-    - name: package_spark_lib
-      uses: docker://getterminus/scala-sbt-ci-image
-      with:
-        args: bash -c "cd spark-lib && sbt assembly"
-    - run: |
-        mkdir spark-lib-target
-        cd spark-lib
-        for dir in $(find ../build -type f -name '*.scala' | sed -r 's|/[^/]+$||' | sort | uniq)
-        do
-          echo $dir
-          cp target/scala-2.11/spark-lib.jar $dir
-        done
-        cp target/scala-2.11/spark-lib.jar ../spark-lib-target/spark-lib.jar
-        cp src/main/scala/${{ inputs.spark_scala_file }} ../spark-lib-target/${{ inputs.spark_scala_file }}
-      shell: bash
-    - uses: actions/upload-artifact@v2
-      with:
-        name: spark-lib-target
-        path: spark-lib-target
-        retention-days: 1
+#    - name: package_spark_lib
+#      uses: docker://getterminus/scala-sbt-ci-image
+#      with:
+#        args: bash -c "cd spark-lib && sbt assembly"
+#    - run: |
+#        mkdir spark-lib-target
+#        cd spark-lib
+#        for dir in $(find ../build -type f -name '*.scala' | sed -r 's|/[^/]+$||' | sort | uniq)
+#        do
+#          echo $dir
+#          cp target/scala-2.11/spark-lib.jar $dir
+#        done
+#        cp target/scala-2.11/spark-lib.jar ../spark-lib-target/spark-lib.jar
+#        cp src/main/scala/${{ inputs.spark_scala_file }} ../spark-lib-target/${{ inputs.spark_scala_file }}
+#      shell: bash
+#    - uses: actions/upload-artifact@v2
+#      with:
+#        name: spark-lib-target
+#        path: spark-lib-target
+#        retention-days: 1
         
