@@ -13,7 +13,7 @@ function validateInput() {
    error_count=0
    for i in "${arr[@]}";
       do
-          if [ ! -z "$i" ]
+          if [ -z "$i" ]
           then
             error_count=$((error_count+1))
             error "$i is empty."
@@ -21,6 +21,7 @@ function validateInput() {
       done
   if [ "$error_count" -gt 0 ]
   then
+    info "For a list of required inputs, please check the corresponding directory in: https://github.com/GetTerminus/terminus-github-actions"
     exit 1
   fi
 }
