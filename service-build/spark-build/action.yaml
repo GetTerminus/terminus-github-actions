@@ -16,31 +16,9 @@ runs:
   steps:
     - name: Validate Inputs
       run: |
-        error () {
-          echo -e "\033[31;1mERROR:\033[0m $1"
-        }
-        newline=$'\n'
-        error_message=''
-        if [ -z "${{ inputs.ssh_key }}" ]
-        then
-          error_message="${error_message}${newline}ssh_key is NULL."
-          error_message="${error_message}${newline}ssh_key description: ${{ inputs.ssh_key.description }}"
-        fi
-        if [ -z "${{ inputs.spark_lib_image }}" ]
-        then
-          error_message="${error_message}${newline}spark_lib_image is NULL."
-          error_message="${error_message}${newline}spark_lib_image description: ${{ inputs.spark_lib_image.description }}"
-        fi
-        if [ -z "${{ inputs.spark_scala_file }}" ]
-        then
-          error_message="${error_message}${newline}spark_scala_file is NULL."
-          error_message="${error_message}${newline}spark_scala_file description: ${{ inputs.spark_scala_file.description }}"
-        fi
-        if [ ! -z "$error_message" ]
-        then
-          error "$error_message"
-          exit 1
-        fi
+        source ../shell-scripts/input-validator.sh
+        inputs="${inputs.ssh_key} ${inputs.spark_lib_image} ${inputs.spark_scala_file}"
+        validateInput "${inputs[@]}"
       shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
