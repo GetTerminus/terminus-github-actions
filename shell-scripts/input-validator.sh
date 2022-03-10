@@ -9,15 +9,15 @@ info () {
 }
 
 function validateInput() {
-   arr=("$@")
+   local -n arr=$1
    error_count=0
-   for key in ${arr[${key}];
+   for key in ${!arr[@]};
       do
-          if [ -z "$i" ]
-          then
-            error_count=$((error_count+1))
-            error "${key} is empty."
-          fi
+        if [ -z "$i" ]
+        then
+          error_count=$((error_count+1))
+          error "${key} is empty."
+        fi
       done
   if [ "$error_count" -gt 0 ]
   then
