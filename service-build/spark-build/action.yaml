@@ -4,22 +4,16 @@ inputs:
   ssh_key:
     description: '[secret] GitHub SSH Key for pulling repo.'
     required: true
-  spark_lib_image:
-    description: '[string] source of the spark lib package docker image.'
-    required: true
   spark_scala_file:
     description: '[string] Filename for spark scala file found in src/main/scala/'
     required: true
-#  pwd
-#  source ${GITHUB_WORKSPACE}/shell-scripts/input-validator.sh
-#  inputs="${inputs.ssh_key} ${inputs.spark_lib_image} ${inputs.spark_scala_file}"
+
 runs:
   using: "composite"
   steps:
     - name: Validate Inputs
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
-        SPARK_LIB_IMAGE: ${{ inputs.spark_lib_image }}
         SPARK_SCALA_FILE: ${{ inputs.spark_scala_file }}
       run: |
         cd ${{ github.action_path }}
@@ -27,7 +21,6 @@ runs:
         
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
-        inputs[spark_lib_image]="$SPARK_LIB_IMAGE"
         inputs[spark_scala_file]="$SPARK_SCALA_FILE"
 
         validateInput inputs
