@@ -20,7 +20,7 @@ runs:
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
-        inputs="${inputs.ssh_key} ${inputs.spark_lib_image} ${inputs.spark_scala_file}"
+        inputs="${inputs.ssh_key} ${inputs.spark_scala_file}"
         validateInput "${inputs[@]}"
       shell: bash
     - name: Install SSH Key
