@@ -18,9 +18,9 @@ runs:
   steps:
     - name: Validate Inputs
       env:
-        SSH_KEY: ${inputs.ssh_key}
-        SPARK_LIB_IMAGE: ${inputs.spark_lib_image}
-        SPARK_SCALA_FILE: ${inputs.spark_scala_file}
+        SSH_KEY: ${{ inputs.ssh_key }}
+        SPARK_LIB_IMAGE: ${{ inputs.spark_lib_image }}
+        SPARK_SCALA_FILE: ${{ inputs.spark_scala_file }}
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
