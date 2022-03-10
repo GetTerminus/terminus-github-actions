@@ -16,6 +16,7 @@ runs:
   steps:
     - name: Validate Inputs
       run: |
+        pwd
         source ../shell-scripts/input-validator.sh
         inputs="${inputs.ssh_key} ${inputs.spark_lib_image} ${inputs.spark_scala_file}"
         validateInput "${inputs[@]}"
