@@ -14,6 +14,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Validate Inputs
+      run: |
+        for item in ${{ inputs }}
+        do
+          echo "${item}"
+        done
+      shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
       with:
