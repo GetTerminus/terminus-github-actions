@@ -13,7 +13,7 @@ function validateInput() {
    error_count=0
    for key in ${!arr[@]};
       do
-        if [ -z ${arr[$key]} ]
+        if [ -z ${arr[${key}]} ]
         then
           error_count=$((error_count+1))
           error "${key} is empty."
