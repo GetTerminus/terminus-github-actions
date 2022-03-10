@@ -11,12 +11,12 @@ info () {
 function validateInput() {
    arr=("$@")
    error_count=0
-   for i in "${arr[@]}";
+   for key in ${arr[${key}];
       do
           if [ -z "$i" ]
           then
             error_count=$((error_count+1))
-            error "$i is empty."
+            error "${key} is empty."
           fi
       done
   if [ "$error_count" -gt 0 ]
