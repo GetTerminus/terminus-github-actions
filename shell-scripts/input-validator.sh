@@ -11,7 +11,7 @@ info () {
 function validateInput() {
    local -n arr=$1
    error_count=0
-   for key in ${arr[@]};
+   for key in ${!arr[@]};
       do
         if [ -z "$val" ]
         then
