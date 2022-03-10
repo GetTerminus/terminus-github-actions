@@ -16,7 +16,6 @@ runs:
   steps:
     - name: Validate Inputs
       run: |
-        RED='\033[0;31m'
         newline=$'\n'
         error_message=''
         if [ -z "${{ inputs.ssh_key }}" ]
@@ -36,7 +35,7 @@ runs:
         fi
         if [ ! -z "$error_message" ]
         then
-          { echo -e "${RED}$error_message"; exit 1; }
+          { tput setaf 1; echo "$error_message"; exit 1; }
         fi
       shell: bash
     - name: Install SSH Key
