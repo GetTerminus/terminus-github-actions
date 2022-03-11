@@ -21,7 +21,7 @@ runs:
         
         declare -A inputs
         inputs[terraform_version]="$TERRAFORM_VERSION"
-        inputs[tf_workspace]="$TF_WORKSPACE"
+        inputs[ssh_key]="$SSH_KEY"
         
         validateInput inputs
       shell: bash
