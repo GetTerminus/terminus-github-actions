@@ -33,8 +33,8 @@ runs:
         source ../../shell-scripts/input-validator.sh
         
         declare -A inputs
+        inputs[ssh_key]="$SSH_KEY"
         inputs[terraform_version]="$TERRAFORM_VERSION"
-        inputs[tf_workspace]="$TF_WORKSPACE"
         inputs[github_token]="$GITHUB_TOKEN"
         
         validateInput inputs
