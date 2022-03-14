@@ -9,14 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Bump version and push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.0
+      - name: Github Tag with semantic versioning
+        uses: hennejg/github-tag-action@v4.3.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: main
-          append_to_pre_release_tag: ''
           dry_run: true
+      #      - name: Bump version and push tag
+#        id: tag_version
+#        uses: mathieudutour/github-tag-action@v6.0
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          release_branches: main
+#          append_to_pre_release_tag: ''
+#          dry_run: true
       - uses: sersoft-gmbh/running-release-tags-action@v1
         with:
           tag: ${{ steps.tag_version.outputs.new_tag }}
