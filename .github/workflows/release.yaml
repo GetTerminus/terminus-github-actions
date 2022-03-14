@@ -13,6 +13,8 @@ jobs:
         uses: hennejg/github-tag-action@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          release_branches: main, dpr-add-auto-tagger
+          release_branches: dpr-add-auto-tagger
           create_annotated_tag: true
-          dry_run: true
+      - uses: kellyselden/move-semver-tags-action@v3
+        with:
+          copy-annotations: true
