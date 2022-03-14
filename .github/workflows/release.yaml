@@ -18,5 +18,5 @@ jobs:
           create_annotated_tag: true
       - uses: sersoft-gmbh/running-release-tags-action@v1
         with:
-          tag: ${{ steps.new_tag.outputs.new_version }}
+          tag: ${{ steps.new_tag.outputs.new_tag }}
           github-token: ${{secrets.GITHUB_TOKEN}}
