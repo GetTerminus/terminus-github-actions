@@ -14,7 +14,7 @@ jobs:
         uses: hennejg/github-tag-action@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          release_branches: dpr-add-auto-tagger
+          release_branches: main
           create_annotated_tag: true
       - uses: sersoft-gmbh/running-release-tags-action@v1
         with:
