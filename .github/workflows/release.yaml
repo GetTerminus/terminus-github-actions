@@ -2,7 +2,17 @@ name: Release
 
 on:
   push:
-    branches: [ main ]
+    branches: [ dpr-add-auto-tagger ]
 
 jobs:
-  deploy-all:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bump and Push Tag Version
+        uses: hennejg/github-tag-action@v4.1.jh1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_branches: main, dpr-add-auto-tagger
+          create_annotated_tag: true
+          dry_run: true
