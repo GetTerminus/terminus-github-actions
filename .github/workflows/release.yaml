@@ -10,11 +10,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Bump and Push Tag Version
+        id: new_tag
         uses: hennejg/github-tag-action@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: dpr-add-auto-tagger
           create_annotated_tag: true
-      - uses: kellyselden/move-semver-tags-action@v3
+      - uses: sersoft-gmbh/running-release-tags-action@v1
         with:
-          copy-annotations: true
+          tag: ${{ steps.new_tag.outputs.new_version }}
+          github-token: ${{secrets.GITHUB_TOKEN}}
