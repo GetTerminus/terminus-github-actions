@@ -20,7 +20,7 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          release_branches: main, dpr-add-auto-tagger
+          release_branches: "dpr-add-auto-tagger"
           dry_run: true
 #      - uses: sersoft-gmbh/running-release-tags-action@v1
 #        with:
