@@ -13,5 +13,6 @@ jobs:
       - uses: sersoft-gmbh/running-release-tags-action@v1
         with:
           tag: v1-beta
+          suffix: "beta"
           create-release: false
           github-token: ${{secrets.GITHUB_TOKEN}}
