@@ -26,7 +26,7 @@ runs:
         DRY_RUN: ${{ inputs.dry_run }}
       run: |
         cd ${{ github.action_path }}
-        source ../../shell-scripts/input-validator.sh
+        source ../shell-scripts/input-validator.sh
         
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
