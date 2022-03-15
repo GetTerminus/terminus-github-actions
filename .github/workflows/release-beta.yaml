@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: sersoft-gmbh/running-release-tags-action@v1
         with:
-          tag: v1-beta
+          tag: v1
           suffix-regex: "beta"
           create-release: false
           github-token: ${{secrets.GITHUB_TOKEN}}
