@@ -10,9 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: sersoft-gmbh/running-release-tags-action@v1
+      - name: Set Beta Git tag
+        uses: weareyipyip/walking-tag-action@v1
         with:
-          tag: v1
-          suffix-regex: "beta"
-          create-release: false
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          tag-name: v1-beta
+          tag-message: The current beta is based on this commit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
