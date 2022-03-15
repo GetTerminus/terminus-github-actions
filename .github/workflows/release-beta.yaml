@@ -17,10 +17,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           custom_release_rules: "*:patch"
           pre_release_branches: "${{ github.ref_name }}"
-          append_to_pre_release_tag: "-beta"
+          append_to_pre_release_tag: "beta"
           dry_run: true
-#      - uses: sersoft-gmbh/running-release-tags-action@v1
-#        with:
-#          tag: ${{ steps.tag_version.outputs.new_tag }}
-#          suffix-regex:
-#          github-token: ${{secrets.GITHUB_TOKEN}}
