@@ -74,7 +74,7 @@ runs:
         printf "\n${RED}5.${NC} Uncomment any attributes that ${RED}show a diff with the state file${NC} or you feel should be controlled via the configuration file."
         printf "\n${RED}6.${NC} Once the terraform plan runs with no changes to infrastructure for the imported resource, remove the code comments and merge your changes."
       shell: bash
-    - name: Update Terraform State File - If dry_run == 'n'
+    - name: Update Terraform State File - If dry_run == 'false'
       if: ${{ inputs.dry_run == 'false' }}
       run: |
         terraform import -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}
