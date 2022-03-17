@@ -31,14 +31,14 @@ runs:
       run: |
         cd ${{ github.action_path }}
         source ../shell-scripts/input-validator.sh
-        
+
         declare -A inputs
         inputs[terraform_version]="$TERRAFORM_VERSION"
         inputs[tf_workspace]="$TF_WORKSPACE"
         inputs[resource_id]="$RESOURCE_ID"
         inputs[resource_name]="$RESOURCE_NAME"
         inputs[dry_run]="$DRY_RUN"
-        
+
         validateInput inputs
       shell: bash
     - name: Install SSH Key
@@ -75,13 +75,12 @@ runs:
         printf "\n${RED}6.${NC} Once the terraform plan runs with no changes to infrastructure for the imported resource, remove the code comments and merge your changes."
       shell: bash
     - name: Update Terraform State File - If dry_run == 'n'
-      if: ${{ inputs.dry_run == 'n' }}
+      if: ${{ inputs.dry_run == 'false' }}
       run: |
         terraform import -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}
       shell: bash
     - name: Show Terraform State File - Find resource that was imported
-      if: ${{ inputs.dry_run == 'n' }}
+      if: ${{ inputs.dry_run == 'false' }}
       run: |
         terraform show
       shell: bash
-        
