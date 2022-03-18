@@ -14,7 +14,7 @@ inputs:
     description: '[bool] [not required] (i.e. true/false) Enable the tf plan commenter.'
     required: false
     default: 'true'
-  initial_run:
+  tf_create_workspace:
     description: '[bool] [not required] (i.e. true/false) If set to true, workspace will be created based on TF_WORKSPACE.
                   This should only be run when creating the repo and running
                   the plan for the first time and removed after.'
@@ -23,6 +23,22 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Validate Inputs
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+        TERRAFORM_VERSION: ${{ inputs.terraform_version }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: |
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+        
+        declare -A inputs
+        inputs[ssh_key]="$SSH_KEY"
+        inputs[terraform_version]="$TERRAFORM_VERSION"
+        inputs[github_token]="$GITHUB_TOKEN"
+        
+        validateInput inputs
+      shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
       with:
@@ -68,7 +84,7 @@ runs:
         commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
         commenter_exitcode: ${{ steps.init.outputs.exitcode }}
     - name: TF Plan - Create Workspace
-      if: ${{ inputs.initial_run == 'true' }}
+      if: ${{ inputs.tf_create_workspace == 'true' }}
       run: |
         terraform workspace new ${{ env.TF_WORKSPACE }}
         terraform workspace select ${{ env.TF_WORKSPACE }}
@@ -94,29 +110,16 @@ runs:
       run: |
         terraform plan -lock=false -input=false -out=tfplan
       shell: bash
-    - name: TF Plan - Show
-      id: show_plan
-      run: |
-        terraform show tfplan
-      shell: bash
-    - name: Clean Plan
-      if: ${{ inputs.enable_plan_commenter == 'true' }}
-      id: clean_plan
-      run: |
-        CLEAN_PLAN=$(echo "${{ steps.show_plan.outputs.stdout }}" | sed -r '/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d')
-        CLEAN_PLAN="${CLEAN_PLAN//'%'/'%25'}"
-        CLEAN_PLAN="${CLEAN_PLAN//$'\n'/'%0A'}"
-        CLEAN_PLAN="${CLEAN_PLAN//$'\r'/'%0D'}"
-        echo "::set-output name=show::$(echo "$CLEAN_PLAN")"
-      shell: bash
     - name: Post TF Plan Comment
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable_plan_commenter == 'true' }}
-      uses: robburger/terraform-pr-commenter@v1.5.0
+      uses: GetTerminus/terraform-pr-commenter@master
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         EXPAND_SUMMARY_DETAILS: "false"
+        TF_WORKSPACE: ${{ inputs.tf_workspace }}
       with:
         commenter_type: plan
-        commenter_input: ${{ format('{0}{1}', steps.clean_plan.outputs.show, steps.plan.outputs.stderr) }}
+        commenter_input: tfplan
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+        terraform_version: ${{ inputs.terraform_version }}
         

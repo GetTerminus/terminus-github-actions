@@ -1,0 +1,35 @@
+name: 'Spark Build'
+description: 'Runs a Spark build.'
+inputs:
+  ssh_key:
+    description: '[secret] GitHub SSH Key for pulling repo.'
+    required: true
+    
+runs:
+  using: "composite"
+  steps:
+    - name: Validate Inputs
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+      run: |
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+        
+        declare -A inputs
+        inputs[ssh_key]="$SSH_KEY"
+        
+        validateInput inputs
+      shell: bash
+    - name: Install SSH Key
+      uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ inputs.ssh_key }}
+    - name: Pull
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: package_spark_lib
+      uses: docker://getterminus/scala-sbt-ci-image
+      with:
+        args: bash -c "cd spark-lib && sbt test"
+        

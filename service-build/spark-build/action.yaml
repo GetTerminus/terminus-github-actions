@@ -1,0 +1,56 @@
+name: 'Spark Build'
+description: 'Runs a Spark build.'
+inputs:
+  ssh_key:
+    description: '[secret] GitHub SSH Key for pulling repo.'
+    required: true
+  spark_scala_file:
+    description: '[string] Filename for spark scala file found in src/main/scala/'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate Inputs
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+        SPARK_SCALA_FILE: ${{ inputs.spark_scala_file }}
+      run: |
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+        
+        declare -A inputs
+        inputs[ssh_key]="$SSH_KEY"
+        inputs[spark_scala_file]="$SPARK_SCALA_FILE"
+
+        validateInput inputs
+      shell: bash
+    - name: Install SSH Key
+      uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ inputs.ssh_key }}
+    - name: Pull
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: package_spark_lib
+      uses: docker://getterminus/scala-sbt-ci-image
+      with:
+        args: bash -c "cd spark-lib && sbt assembly"
+    - run: |
+        mkdir spark-lib-target
+        cd spark-lib
+        for dir in $(find ../build -type f -name '*.scala' | sed -r 's|/[^/]+$||' | sort | uniq)
+        do
+          echo $dir
+          cp target/scala-2.11/spark-lib.jar $dir
+        done
+        cp target/scala-2.11/spark-lib.jar ../spark-lib-target/spark-lib.jar
+        cp src/main/scala/${{ inputs.spark_scala_file }} ../spark-lib-target/${{ inputs.spark_scala_file }}
+      shell: bash
+    - uses: actions/upload-artifact@v2
+      with:
+        name: spark-lib-target
+        path: spark-lib-target
+        retention-days: 1
+        

@@ -1,0 +1,66 @@
+name: 'Go Build'
+description: 'Runs a GO build.'
+inputs:
+  ssh_key:
+    description: '[secret] GitHub SSH Key for pulling repo.'
+    required: true
+  go_version:
+    description: '[string] GO version for build.'
+    required: true
+  cmd_to_build:
+    description: '[string] cmd to build.'
+    required: true
+    
+runs:
+  using: "composite"
+  steps:
+    - name: Validate Inputs
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+        GO_VERSION: ${{ inputs.go_version }}
+        CMD_TO_BUILD: ${{ inputs.cmd_to_build }}
+      run: |
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+        
+        declare -A inputs
+        inputs[ssh_key]="$SSH_KEY"
+        inputs[go_version]="$GO_VERSION"
+        inputs[cmd_to_build]="$CMD_TO_BUILD"
+        
+        validateInput inputs
+      shell: bash
+    - name: Set Environmental Variables
+      run: |
+        echo "GOPRIVATE=github.com/GetTerminus/*" >> $GITHUB_ENV
+        echo "GOFLAGS=-mod=vendor" >> $GITHUB_ENV
+        echo "CGO_ENABLED=0" >> $GITHUB_ENV
+        echo "GOOS=linux" >> $GITHUB_ENV
+        echo "GOARCH=amd64" >> $GITHUB_ENV
+      shell: bash
+    - name: Install SSH Key
+      uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ inputs.ssh_key }}
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ inputs.go_version }}
+    - name: Pull
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: Build
+      run: |
+        cd "./cmd/${{ inputs.cmd_to_build }}"
+        go build -installsuffix cgo
+        mkdir -p "../../build/bins"
+        mv "${{ inputs.cmd_to_build }}" "../../build/bins/${{ inputs.cmd_to_build }}"
+      shell: bash
+    - name: Store
+      uses: actions/upload-artifact@v2
+      with:
+        name: go-build
+        path: build/bins
+        retention-days: 1
+        

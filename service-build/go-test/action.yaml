@@ -1,0 +1,66 @@
+name: 'Go Test'
+description: 'Runs a GO lint and test.'
+inputs:
+  ssh_key:
+    description: '[secret] GitHub SSH Key for pulling repo.'
+    required: true
+  go_version:
+    description: '[string] GO version for build and test.'
+    required: true
+  dynamo_test_endpoint:
+    description: '[string] dynamo_test_endpoint.'
+    required: true
+  coveralls_token:
+    description: '[secret] coveralls token.'
+    required: true
+    
+runs:
+  using: "composite"
+  steps:
+    - name: Validate Inputs
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+        GO_VERSION: ${{ inputs.go_version }}
+        DYNAMO_TEST_ENDPOINT: ${{ inputs.dynamo_test_endpoint }}
+        COVERALLS_TOKEN: ${{ inputs.coveralls_token }}
+      run: |
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+        
+        declare -A inputs
+        inputs[ssh_key]="$SSH_KEY"
+        inputs[go_version]="$GO_VERSION"
+        inputs[dynamo_test_endpoint]="$DYNAMO_TEST_ENDPOINT"
+        inputs[coveralls_token]="$COVERALLS_TOKEN"
+        
+        validateInput inputs
+      shell: bash
+    - name: Set Environmental Variables
+      run: |
+        echo "GOPRIVATE=github.com/GetTerminus/*" >> $GITHUB_ENV
+        echo "GOFLAGS=-mod=vendor" >> $GITHUB_ENV
+      shell: bash
+    - name: Install SSH Key
+      uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ inputs.ssh_key }}
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ inputs.go_version }}
+    - uses: actions/checkout@v2
+    - name: Go Lint
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: latest
+    - name: Test
+      run: go test -v -race -coverprofile=profile.cov -shuffle on ./...
+      env:
+        DYNAMO_TEST_ENDPOINT: ${{ inputs.dynamo_test_endpoint }}
+      shell: bash
+    - name: Send coverage
+      uses: shogo82148/actions-goveralls@v1
+      with:
+        path-to-profile: profile.cov
+        token: ${{ inputs.coveralls_token }}
+        
