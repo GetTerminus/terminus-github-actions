@@ -160,16 +160,7 @@ runs:
     - name: Get Local Service Name
       id: service_name
       run: |
-        terraform output service_name || true
-        output=$(terraform output service_name || true)
-        echo ""
-        echo ""
-        echo ""
-        echo $output
-        echo ""
-        echo ""
-        echo ""
-        echo "::set-output name=service_name::$output"
+        echo "::set-output name=service_name::$(terraform output service_name || true)"
       shell: bash
 #    - name: Run Datadog Synthetics tests
 #      if: ${{ steps.service_name.outputs.service_name }}
@@ -179,7 +170,7 @@ runs:
 #        app_key: $DATADOG_APP_KEY
 #        test_search_query: 'tag:${{ steps.service_name.outputs.service_name }}'
     - name: Warn if service_name Output is not Set
-      if: steps.service_name.outcome == 'failure'
+      if: ${{ steps.service_name.outcome == 'failure' }}
       run: |
         echo "::warning title=service_name not set::service_name is not set as a terraform output."
         printf "\nIn order to automatically trigger datadog synthetic tests\nand to prevent errors being deployed to prod,\nplease set service_name as an output in locals.tf like below\n"
