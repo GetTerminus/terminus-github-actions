@@ -160,6 +160,7 @@ runs:
     - name: Get Local Service Name
       id: service_name
       run: |
+        terraform output service_name
         output=$(terraform output service_name)
         echo "::set-output name=service_name::$output"
       shell: bash
