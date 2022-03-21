@@ -160,7 +160,7 @@ runs:
     - name: Get Local Service Name
       id: service_name
       run: |
-        echo "::set-output name=service_name::$(terraform output service_name || echo "::set-output name=service_name::'')"
+        echo "::set-output name=service_name::$(terraform output service_name || echo "::set-output name=service_name::false)"
       shell: bash
 #    - name: Run Datadog Synthetics tests
 #      if: ${{ steps.service_name.outputs.service_name }}
