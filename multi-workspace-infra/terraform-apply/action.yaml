@@ -38,12 +38,12 @@ runs:
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
-        
+
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
         inputs[terraform_version]="$TERRAFORM_VERSION"
         inputs[tf_workspace]="$TF_WORKSPACE"
-        
+
         validateInput inputs
       shell: bash
     - name: Install SSH Key
@@ -97,6 +97,15 @@ runs:
         terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=true -lock-timeout=0s -input=false -out=tfplan
         terraform apply -lock=true -lock-timeout=0s -input=false tfplan
       shell: bash
+    - name: Get Local Service Name
+      id: service_name
+      run: |
+        echo "::set-output name=service_name::$(terraform output service_name)"
+      shell: bash
+    - name: Run Datadog Synthetics tests
+      uses: DataDog/synthetics-ci-github-action@v0.2.2
+      with:
+        test_search_query: 'tag:${{ steps.service_name.outputs.service_name }}'
     - name: Deployment Success
       if: ${{ success() && inputs.use_delivery_bot == 'true' }}
       uses: deliverybot/deployment-status@v1
@@ -109,4 +118,3 @@ runs:
       with:
         state: failure
         token: ${{ github.token }}
-      

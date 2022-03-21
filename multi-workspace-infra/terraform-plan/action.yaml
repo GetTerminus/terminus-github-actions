@@ -34,7 +34,7 @@ inputs:
                   removed after.'
     required: false
     default: 'false'
-    
+
 runs:
   using: "composite"
   steps:
@@ -78,7 +78,7 @@ runs:
     - name: Terraform Format Check
       id: fmt
       run: |
-        terraform fmt -check -recursive || echo "::set-output name=exitcode_continue_on_error::$?" 
+        terraform fmt -check -recursive || echo "::set-output name=exitcode_continue_on_error::$?"
       #TODO: Uncomment once github supports it
       #continue-on-error: true
       shell: bash
@@ -157,4 +157,12 @@ runs:
         commenter_input: tfplan
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
         terraform_version: ${{ inputs.terraform_version }}
-        
+    - name: Get Local Service Name
+      id: service_name
+      run: |
+        echo "::set-output name=service_name::$(terraform output service_name)"
+      shell: bash
+    - name: Run Datadog Synthetics tests
+      uses: DataDog/synthetics-ci-github-action@v0.2.2
+      with:
+        test_search_query: 'tag:${{ steps.service_name.outputs.service_name }}'
