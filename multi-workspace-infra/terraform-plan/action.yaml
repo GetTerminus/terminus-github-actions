@@ -162,6 +162,9 @@ runs:
       run: |
         echo "::set-output name=service_name::$(terraform output service_name)"
       shell: bash
+    - name: Test
+      run: echo ${{ steps.service_name.outputs.service_name }}
+      shell: bash
     - name: Run Datadog Synthetics tests
       if: ${{ steps.service_name.outputs.service_name != '' }}
       uses: DataDog/synthetics-ci-github-action@v0.2.2
