@@ -157,28 +157,3 @@ runs:
         commenter_input: tfplan
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
         terraform_version: ${{ inputs.terraform_version }}
-    - name: Get Local Service Name
-      id: service_name
-      run: |
-        if output=$(terraform output service_name)
-        then
-          echo -e "\nFound service_name!\n"
-          echo "::set-output name=service_name::${output}"
-        else
-          echo ""
-          echo "::warning title=service_name not set::service_name is not set as a terraform output."
-          echo -e "\nIn order to automatically trigger datadog synthetic tests and to\nprevent errors being deployed to prod, please set service_name\nas an output in locals.tf like the example below:\n"
-          echo -e "output service_name {\n"
-          echo -e "  value = local.service_name\n"
-          echo -e "}\n"
-          echo "::set-output name=service_name::false"
-          echo "::warning title=tf apply must run::tf apply must runis not set as a terraform output."
-        fi
-      shell: bash
-    - name: Run Datadog Synthetics tests
-      if: ${{ steps.service_name.outputs.service_name != 'false' }}
-      uses: DataDog/synthetics-ci-github-action@v0.2.2
-      with:
-        api_key: $DATADOG_API_KEY
-        app_key: $DATADOG_APP_KEY
-        test_search_query: 'tag:${{ steps.service_name.outputs.service_name }}'
