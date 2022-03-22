@@ -162,27 +162,23 @@ runs:
       run: |
         if output=$(terraform output service_name)
         then
-          echo "Found service_name!"
+          echo -e "\nFound service_name!\n"
           echo "::set-output name=service_name::${output}"
         else
-          echo "service_name not found!"
+          echo ""
+          echo "::warning title=service_name not set::service_name is not set as a terraform output."
+          echo -e "\nIn order to automatically trigger datadog synthetic tests and to\nprevent errors being deployed to prod, please set service_name\nas an output in locals.tf like the example below:\n"
+          echo -e "output service_name {\n"
+          echo -e "  value = local.service_name\n"
+          echo -e "}\n"
           echo "::set-output name=service_name::false"
+          echo "::warning title=tf apply must run::tf apply must runis not set as a terraform output."
         fi
       shell: bash
-#    - name: Run Datadog Synthetics tests
-#      if: ${{ steps.service_name.outputs.service_name }}
-#      uses: DataDog/synthetics-ci-github-action@v0.2.2
-#      with:
-#        api_key: $DATADOG_API_KEY
-#        app_key: $DATADOG_APP_KEY
-#        test_search_query: 'tag:${{ steps.service_name.outputs.service_name }}'
-#        ${{ contains(steps.service_name.outputs.service_name, 'The output variable requested could not be found in the state') }}
-    - name: Warn if service_name Output is not Set
-      run: |
-        echo "Step Output: ${{ steps.service_name.outputs.service_name }}"
-        echo "::warning title=service_name not set::service_name is not set as a terraform output."
-        echo -e "\nIn order to automatically trigger datadog synthetic tests\nand to prevent errors being deployed to prod,\nplease set service_name as an output in locals.tf like below\n"
-        echo -e "output service_name {\n"
-        echo -e "  value = local.service_name\n"
-        echo -e "}"
-      shell: bash
+    - name: Run Datadog Synthetics tests
+      if: ${{ steps.service_name.outputs.service_name }}
+      uses: DataDog/synthetics-ci-github-action@v0.2.2
+      with:
+        api_key: $DATADOG_API_KEY
+        app_key: $DATADOG_APP_KEY
+        test_search_query: 'tag:${{ steps.service_name.outputs.service_name }}'
