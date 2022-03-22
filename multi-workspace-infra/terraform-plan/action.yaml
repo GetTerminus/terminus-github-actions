@@ -172,10 +172,10 @@ runs:
 #        ${{ contains(steps.service_name.outputs.service_name, 'The output variable requested could not be found in the state') }}
     - name: Warn if service_name Output is not Set
       run: |
-        printf "Test: ${{ steps.service_name.outputs.service_name }}"
+        echo ${{ steps.service_name.outputs.service_name }}
         echo "::warning title=service_name not set::service_name is not set as a terraform output."
-        printf "\nIn order to automatically trigger datadog synthetic tests\nand to prevent errors being deployed to prod,\nplease set service_name as an output in locals.tf like below\n"
-        printf "output service_name {\n"
-        printf "  value = local.service_name\n"
-        printf "}"
+        echo -e "\nIn order to automatically trigger datadog synthetic tests\nand to prevent errors being deployed to prod,\nplease set service_name as an output in locals.tf like below\n"
+        echo -e "output service_name {\n"
+        echo -e "  value = local.service_name\n"
+        echo -e "}"
       shell: bash
