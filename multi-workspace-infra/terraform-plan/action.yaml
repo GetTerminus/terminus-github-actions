@@ -176,7 +176,7 @@ runs:
         fi
       shell: bash
     - name: Run Datadog Synthetics tests
-      if: ${{ steps.service_name.outputs.service_name }}
+      if: ${{ steps.service_name.outputs.service_name != 'false' }}
       uses: DataDog/synthetics-ci-github-action@v0.2.2
       with:
         api_key: $DATADOG_API_KEY
