@@ -39,7 +39,7 @@ runs:
   using: "composite"
   steps:
     - name: Validate Inputs
-      working-directory: ./shell-scripts
+      working-directory: $(find ${{ github.action_path }} -type d -name) shell-scripts
       run: |
         echo "TEST: ${{ join(inputs.*, '/n') }}
       shell: bash
