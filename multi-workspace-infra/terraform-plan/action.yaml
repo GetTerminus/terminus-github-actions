@@ -42,9 +42,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set Github Repo to Env Variable
-      run: echo ::set-env name=GITHUB_REPOSITORY::$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
-      shell: bash
 #    - name: Validate Inputs
 #      env:
 #        SSH_KEY: ${{ inputs.ssh_key }}
@@ -164,6 +161,10 @@ runs:
 #        commenter_input: tfplan
 #        commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
 #        terraform_version: ${{ inputs.terraform_version }}
+    - name: Set Github Repo to Env Variable
+      run: |
+        echo "GITHUB_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      shell: bash
     - name: Check Datadog Keys
       if: ${{ inputs.dd_trigger_synthetic_tests == 'true' }}
       id: dd_keys
