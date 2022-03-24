@@ -165,14 +165,14 @@ runs:
       if: ${{ inputs.dd_trigger_synthetic_tests == 'true' }}
       id: dd_keys
       run: |
-        if [ ! -z ${{ env.DATADOG_API_KEY }} ]
+        if [ -z ${{ env.DATADOG_API_KEY }} ]
         then
           echo ""
           echo "::warning title=DATADOG_API_KEY Not Set::DATADOG_API_KEY env variable must be set in order to trigger datadog synthetic tests from the CI."
           echo "::set-output name=dd_keys::false"
           echo ""
         fi
-        if [ ! -z ${{ env.DATADOG_APP_KEY }} ]
+        if [ -z ${{ env.DATADOG_APP_KEY }} ]
         then
           echo ""
           echo "::warning title=DATADOG_APP_KEY Not Set::DATADOG_APP_KEY env variable must be set in order to trigger datadog synthetic tests from the CI."
