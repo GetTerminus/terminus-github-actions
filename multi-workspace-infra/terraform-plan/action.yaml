@@ -171,7 +171,8 @@ runs:
           echo "::warning title=DATADOG_API_KEY Not Set::DATADOG_API_KEY env variable must be set in order to trigger datadog synthetic tests from the CI."
           echo "::set-output name=dd_keys::false"
           echo ""
-        elif [ ! -z ${{ env.DATADOG_APP_KEY }} ]
+        fi
+        if [ ! -z ${{ env.DATADOG_APP_KEY }} ]
         then
           echo ""
           echo "::warning title=DATADOG_APP_KEY Not Set::DATADOG_APP_KEY env variable must be set in order to trigger datadog synthetic tests from the CI."
@@ -180,7 +181,7 @@ runs:
         fi
       shell: bash
     - name: Run Datadog Synthetics tests
-      if: ${{ steps.dd_keys.outputs.managed_by != 'false' && inputs.dd_trigger_synthetic_tests == 'true' }}
+      if: ${{ steps.dd_keys.outputs.dd_keys != 'false' && inputs.dd_trigger_synthetic_tests == 'true' }}
       uses: DataDog/synthetics-ci-github-action@v0.2.2
       with:
         api_key: ${{ env.DATADOG_API_KEY }}
