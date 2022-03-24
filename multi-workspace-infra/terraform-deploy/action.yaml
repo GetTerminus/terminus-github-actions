@@ -4,6 +4,10 @@ inputs:
   gh_deployment_access_token:
     description: '[secret] GitHub deployment access token.'
     required: true
+  environment:
+    description: 'target deployment environment'
+    default: all
+    required: false
 runs:
   using: "composite"
   steps:
@@ -23,6 +27,5 @@ runs:
       uses: chrnorm/deployment-action@releases/v1
       with:
         token: ${{ inputs.gh_deployment_access_token }}
-        environment: all
+        environment: ${{ inputs.environment }}
         use_delivery_bot: true
-      
