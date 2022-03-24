@@ -34,160 +34,126 @@ inputs:
                   removed after.'
     required: false
     default: 'false'
-  dd_trigger_synthetic_tests:
-    description: '[bool] (i.e. true/false) Enable the tf plan commenter.'
-    required: false
-    default: 'true'
 
 runs:
   using: "composite"
   steps:
-#    - name: Validate Inputs
-#      env:
-#        SSH_KEY: ${{ inputs.ssh_key }}
-#        TERRAFORM_VERSION: ${{ inputs.terraform_version }}
-#        TF_WORKSPACE: ${{ inputs.tf_workspace }}
-#        GITHUB_TOKEN: ${{ inputs.github_token }}
-#      run: |
-#        cd ${{ github.action_path }}
-#        source ../../shell-scripts/input-validator.sh
-#
-#        declare -A inputs
-#        inputs[ssh_key]="$SSH_KEY"
-#        inputs[terraform_version]="$TERRAFORM_VERSION"
-#        inputs[tf_workspace]="$TF_WORKSPACE"
-#        inputs[github_token]="$GITHUB_TOKEN"
-#
-#        validateInput inputs
-#      shell: bash
-#    - name: Install SSH Key
-#      uses: webfactory/ssh-agent@v0.4.1
-#      with:
-#        ssh-private-key: ${{ inputs.ssh_key }}
-#    - name: Pull
-#      uses: actions/checkout@v2
-#      with:
-#        lfs: true
-#    - name: Helm Update
-#      if: ${{ inputs.artifactory_enabled == 'true' }}
-#      run: |
-#        helm repo add terminus https://getterminus.jfrog.io/artifactory/default-helm/ --username developer --password ${{ inputs.artifactory_read_access_token }}
-#        helm repo update
-#        helm dependency update ${{ inputs.artifactory_helm_chart_path }}
-#      shell: bash
-#    - name: HashiCorp - Setup Terraform
-#      uses: hashicorp/setup-terraform@v1.2.1
-#      with:
-#        terraform_version: ${{ inputs.terraform_version }}
-#    - name: Terraform Format Check
-#      id: fmt
-#      run: |
-#        terraform fmt -check -recursive || echo "::set-output name=exitcode_continue_on_error::$?"
-#      #TODO: Uncomment once github supports it
-#      #continue-on-error: true
-#      shell: bash
-#    - name: Post TF Format Check
-#      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
-#      uses: GetTerminus/terraform-pr-commenter@master
-#      env:
-#        GITHUB_TOKEN: ${{ inputs.github_token }}
-#        EXPAND_SUMMARY_DETAILS: "false"
-#      with:
-#        commenter_type: fmt
-#        commenter_input: ${{ format('{0}{1}', steps.fmt.outputs.stdout, steps.fmt.outputs.stderr) }}
-#        commenter_exitcode: ${{ steps.fmt.outputs.exitcode }}
-#        terraform_version: ${{ inputs.terraform_version }}
-#    - name: TF Plan - Initialize
-#      id: init
-#      run: |
-#        terraform version
-#        terraform init -lock=false -input=false
-#      shell: bash
-#    - name: Post TF Init Comment
-#      # TODO: Add in the below code to all plan commenter if statements when github adds in the functionality
-#      # (steps.init.outcome == 'success' || steps.init.outcome == 'failure')
-#      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
-#      uses: GetTerminus/terraform-pr-commenter@master
-#      env:
-#        GITHUB_TOKEN: ${{ inputs.github_token }}
-#        EXPAND_SUMMARY_DETAILS: "false"
-#      with:
-#        commenter_type: init
-#        commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
-#        commenter_exitcode: ${{ steps.init.outputs.exitcode }}
-#        terraform_version: ${{ inputs.terraform_version }}
-#    - name: TF Plan - Select Workspace
-#      if: ${{ inputs.tf_create_workspace != 'true' }}
-#      run: |
-#        terraform workspace select ${{ inputs.tf_workspace }}
-#      shell: bash
-#    - name: TF Plan - Create Workspace
-#      if: ${{ inputs.tf_create_workspace == 'true' }}
-#      run: |
-#        terraform workspace new ${{ inputs.tf_workspace }}
-#        terraform workspace select ${{ inputs.tf_workspace }}
-#      shell: bash
-#    - name: TF Plan - Validate
-#      id: validate
-#      run: |
-#        terraform validate
-#        terraform workspace show
-#      shell: bash
-#    - name: Post TF Validate Comment
-#      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
-#      uses: GetTerminus/terraform-pr-commenter@master
-#      env:
-#        GITHUB_TOKEN: ${{ inputs.github_token }}
-#        EXPAND_SUMMARY_DETAILS: "false"
-#      with:
-#        commenter_type: validate
-#        commenter_input: ${{ format('{0}{1}', steps.validate.outputs.stdout, steps.validate.outputs.stderr) }}
-#        commenter_exitcode: ${{ steps.validate.outputs.exitcode }}
-#        terraform_version: ${{ inputs.terraform_version }}
-#    - name: TF Plan - Run
-#      id: plan
-#      run: |
-#        terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=false -input=false -out=tfplan
-#      shell: bash
-#    - name: Post TF Plan Comment
-#      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable_plan_commenter == 'true' }}
-#      uses: GetTerminus/terraform-pr-commenter@master
-#      env:
-#        GITHUB_TOKEN: ${{ inputs.github_token }}
-#        EXPAND_SUMMARY_DETAILS: "false"
-#        TF_WORKSPACE: ${{ inputs.tf_workspace }}
-#      with:
-#        commenter_type: plan
-#        commenter_input: tfplan
-#        commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
-#        terraform_version: ${{ inputs.terraform_version }}
-    - name: Set Github Repo to Env Variable
+    - name: Validate Inputs
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+        TERRAFORM_VERSION: ${{ inputs.terraform_version }}
+        TF_WORKSPACE: ${{ inputs.tf_workspace }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
-        echo "GITHUB_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        cd ${{ github.action_path }}
+        source ../../shell-scripts/input-validator.sh
+
+        declare -A inputs
+        inputs[ssh_key]="$SSH_KEY"
+        inputs[terraform_version]="$TERRAFORM_VERSION"
+        inputs[tf_workspace]="$TF_WORKSPACE"
+        inputs[github_token]="$GITHUB_TOKEN"
+
+        validateInput inputs
       shell: bash
-    - name: Check Datadog Keys
-      if: ${{ inputs.dd_trigger_synthetic_tests == 'true' }}
-      id: dd_keys
-      run: |
-        if [ -z ${{ env.DATADOG_API_KEY }} ]
-        then
-          echo ""
-          echo "::warning title=DATADOG_API_KEY Not Set::DATADOG_API_KEY env variable must be set in order to trigger datadog synthetic tests from the CI."
-          echo "::set-output name=dd_keys::false"
-          echo ""
-        fi
-        if [ -z ${{ env.DATADOG_APP_KEY }} ]
-        then
-          echo ""
-          echo "::warning title=DATADOG_APP_KEY Not Set::DATADOG_APP_KEY env variable must be set in order to trigger datadog synthetic tests from the CI."
-          echo "::set-output name=dd_keys::false"
-          echo ""
-        fi
-      shell: bash
-    - name: Run Datadog Synthetics tests
-      if: ${{ steps.dd_keys.outputs.dd_keys != 'false' && inputs.dd_trigger_synthetic_tests == 'true' }}
-      uses: DataDog/synthetics-ci-github-action@v0.2.2
+    - name: Install SSH Key
+      uses: webfactory/ssh-agent@v0.4.1
       with:
-        api_key: ${{ env.DATADOG_API_KEY }}
-        app_key: ${{ env.DATADOG_APP_KEY }}
-        test_search_query: 'tag:managedby:*${{ env.GITHUB_REPOSITORY }}*'
+        ssh-private-key: ${{ inputs.ssh_key }}
+    - name: Pull
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: Helm Update
+      if: ${{ inputs.artifactory_enabled == 'true' }}
+      run: |
+        helm repo add terminus https://getterminus.jfrog.io/artifactory/default-helm/ --username developer --password ${{ inputs.artifactory_read_access_token }}
+        helm repo update
+        helm dependency update ${{ inputs.artifactory_helm_chart_path }}
+      shell: bash
+    - name: HashiCorp - Setup Terraform
+      uses: hashicorp/setup-terraform@v1.2.1
+      with:
+        terraform_version: ${{ inputs.terraform_version }}
+    - name: Terraform Format Check
+      id: fmt
+      run: |
+        terraform fmt -check -recursive || echo "::set-output name=exitcode_continue_on_error::$?"
+      #TODO: Uncomment once github supports it
+      #continue-on-error: true
+      shell: bash
+    - name: Post TF Format Check
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+      uses: GetTerminus/terraform-pr-commenter@master
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        EXPAND_SUMMARY_DETAILS: "false"
+      with:
+        commenter_type: fmt
+        commenter_input: ${{ format('{0}{1}', steps.fmt.outputs.stdout, steps.fmt.outputs.stderr) }}
+        commenter_exitcode: ${{ steps.fmt.outputs.exitcode }}
+        terraform_version: ${{ inputs.terraform_version }}
+    - name: TF Plan - Initialize
+      id: init
+      run: |
+        terraform version
+        terraform init -lock=false -input=false
+      shell: bash
+    - name: Post TF Init Comment
+      # TODO: Add in the below code to all plan commenter if statements when github adds in the functionality
+      # (steps.init.outcome == 'success' || steps.init.outcome == 'failure')
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+      uses: GetTerminus/terraform-pr-commenter@master
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        EXPAND_SUMMARY_DETAILS: "false"
+      with:
+        commenter_type: init
+        commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
+        commenter_exitcode: ${{ steps.init.outputs.exitcode }}
+        terraform_version: ${{ inputs.terraform_version }}
+    - name: TF Plan - Select Workspace
+      if: ${{ inputs.tf_create_workspace != 'true' }}
+      run: |
+        terraform workspace select ${{ inputs.tf_workspace }}
+      shell: bash
+    - name: TF Plan - Create Workspace
+      if: ${{ inputs.tf_create_workspace == 'true' }}
+      run: |
+        terraform workspace new ${{ inputs.tf_workspace }}
+        terraform workspace select ${{ inputs.tf_workspace }}
+      shell: bash
+    - name: TF Plan - Validate
+      id: validate
+      run: |
+        terraform validate
+        terraform workspace show
+      shell: bash
+    - name: Post TF Validate Comment
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+      uses: GetTerminus/terraform-pr-commenter@master
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        EXPAND_SUMMARY_DETAILS: "false"
+      with:
+        commenter_type: validate
+        commenter_input: ${{ format('{0}{1}', steps.validate.outputs.stdout, steps.validate.outputs.stderr) }}
+        commenter_exitcode: ${{ steps.validate.outputs.exitcode }}
+        terraform_version: ${{ inputs.terraform_version }}
+    - name: TF Plan - Run
+      id: plan
+      run: |
+        terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=false -input=false -out=tfplan
+      shell: bash
+    - name: Post TF Plan Comment
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable_plan_commenter == 'true' }}
+      uses: GetTerminus/terraform-pr-commenter@master
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        EXPAND_SUMMARY_DETAILS: "false"
+        TF_WORKSPACE: ${{ inputs.tf_workspace }}
+      with:
+        commenter_type: plan
+        commenter_input: tfplan
+        commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+        terraform_version: ${{ inputs.terraform_version }}

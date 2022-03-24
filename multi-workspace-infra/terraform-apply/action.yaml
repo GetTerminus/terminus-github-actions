@@ -26,6 +26,10 @@ inputs:
   use_delivery_bot:
     description: '[bool] (i.e. true/false) Whether or not to run the delivery bot deployment status steps.'
     required: false
+  dd_trigger_synthetic_tests:
+    description: '[bool] (i.e. true/false) Enable the tf plan commenter.'
+    required: false
+    default: 'true'
 
 runs:
   using: "composite"
@@ -97,39 +101,33 @@ runs:
         terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=true -lock-timeout=0s -input=false -out=tfplan
         terraform apply -lock=true -lock-timeout=0s -input=false tfplan
       shell: bash
-    - name: Get Managing Repo
-      id: managed_by
+    - name: Set Github Repo to Env Variable
       run: |
-        if output=$(terraform output managed_by)
+        echo "GITHUB_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      shell: bash
+    - name: Check Datadog Keys
+      if: ${{ inputs.dd_trigger_synthetic_tests == 'true' }}
+      id: dd_keys
+      run: |
+        if [ -z ${{ env.DATADOG_API_KEY }} ]
         then
-          echo -e "\nFound managed_by!\n"
-          echo "::set-output name=managed_by::${output}"
-        else
           echo ""
-          echo "::warning title=managed_by not set::managed_by is not set as a terraform output."
-          echo -e "\nIn order to automatically trigger datadog synthetic tests and to\nprevent errors being deployed to prod, please set managed_by\nas an output in locals.tf like the example below:\n"
-          echo -e "output managed_by {\n"
-          echo -e "  value = local.predefined_tags.ManagedBy\n"
-          echo -e "}\n"
-          echo "::set-output name=managed_by::false"
+          echo "::warning title=DATADOG_API_KEY Not Set::DATADOG_API_KEY env variable must be set in order to trigger datadog synthetic tests from the CI."
+          echo "::set-output name=dd_keys::false"
+          echo ""
+        fi
+        if [ -z ${{ env.DATADOG_APP_KEY }} ]
+        then
+          echo ""
+          echo "::warning title=DATADOG_APP_KEY Not Set::DATADOG_APP_KEY env variable must be set in order to trigger datadog synthetic tests from the CI."
+          echo "::set-output name=dd_keys::false"
+          echo ""
         fi
       shell: bash
     - name: Run Datadog Synthetics tests
-      if: ${{ steps.managed_by.outputs.managed_by != 'false' }}
+      if: ${{ steps.dd_keys.outputs.dd_keys != 'false' && inputs.dd_trigger_synthetic_tests == 'true' }}
       uses: DataDog/synthetics-ci-github-action@v0.2.2
       with:
-        api_key: $DATADOG_API_KEY
-        app_key: $DATADOG_APP_KEY
-        test_search_query: 'managedBy:${{ steps.managed_by.outputs.managed_by }}'
-    - name: Deployment Success
-      if: ${{ success() && inputs.use_delivery_bot == 'true' }}
-      uses: deliverybot/deployment-status@v1
-      with:
-        state: success
-        token: ${{ github.token }}
-    - name: Deployment Failure
-      if: ${{ failure() && inputs.use_delivery_bot == 'true' }}
-      uses: deliverybot/deployment-status@v1
-      with:
-        state: failure
-        token: ${{ github.token }}
+        api_key: ${{ env.DATADOG_API_KEY }}
+        app_key: ${{ env.DATADOG_APP_KEY }}
+        test_search_query: 'tag:managedby:*${{ env.GITHUB_REPOSITORY }}*'
