@@ -29,7 +29,7 @@ inputs:
   dd_trigger_synthetic_tests:
     description: '[bool] (i.e. true/false) Enable the tf plan commenter.'
     required: false
-    default: 'true'
+    default: 'false'
 
 runs:
   using: "composite"
