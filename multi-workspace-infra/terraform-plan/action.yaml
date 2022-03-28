@@ -44,7 +44,7 @@ runs:
 #      shell: bash
     - name: Validate Inputs
       env:
-        GITHUB_CONTEXT: ${{ toJson(inputs) }}
+        GITHUB_CONTEXT: ${{ toJson(github.event.inputs) }}
       run: echo "$GITHUB_CONTEXT"
       shell: bash
 #    - name: Validate Inputs
