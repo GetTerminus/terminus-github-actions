@@ -44,7 +44,7 @@ runs:
 #      shell: bash
     - name: Validate Inputs
       run: |
-        printenv | grep INPUT_*
+        printenv
       shell: bash
 #    - name: Validate Inputs
 #      env:
