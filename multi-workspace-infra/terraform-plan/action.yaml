@@ -44,7 +44,7 @@ runs:
 #      shell: bash
     - name: Validate Inputs
       run: |
-        env | grep "INPUT_*"
+        compgen -A variable | grep INPUT_*
       shell: bash
 #    - name: Validate Inputs
 #      env:
