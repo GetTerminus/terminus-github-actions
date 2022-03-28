@@ -46,15 +46,17 @@ runs:
       env:
         GITHUB_CONTEXT: ${{ toJson(inputs) }}
       run: |
-        local json=$GITHUB_CONTEXT
+        json=$GITHUB_CONTEXT
 
-        local filter='to_entries | map("[\(.key)]=\(.value)") |
+        filter='to_entries | map("[\(.key)]=\(.value)") |
         reduce .[] as $item ("associativeArray=("; . + ($item|@sh) + " ") + ")"'
 
-        local arrayAsString;
+        declare -A arrayAsString=$(cat "$json" | jq --raw-output "${filter}")
 
-        arrayAsString=$(cat "$json" | jq --raw-output "${filter}")
-        local -A "$arrayAsString"
+        for key in "${!arrayAsString[@]}"
+        do
+            echo "$key = ${arrayAsString[$key]}"
+        done
       shell: bash
 #    - name: Validate Inputs
 #      env:
