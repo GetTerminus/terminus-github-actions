@@ -44,8 +44,20 @@ runs:
 #      shell: bash
     - name: Validate Inputs
       env:
-        GITHUB_CONTEXT: ${{ toJson(inputs.name) }}
-      run: echo "$GITHUB_CONTEXT"
+        GITHUB_CONTEXT: ${{ toJson(inputs) }}
+      run: |
+        echo "$GITHUB_CONTEXT"
+
+        declare -A myarray
+        while IFS="=" read -r key value
+        do
+            myarray[$key]="$value"
+        done < <(jq -r 'to_entries|map("(.key)=(.value)")|.[]' $GITHUB_CONTEXT)
+
+        for key in "${!myarray[@]}"
+        do
+            echo "$key = ${myarray[$key]}"
+        done
       shell: bash
 #    - name: Validate Inputs
 #      env:
