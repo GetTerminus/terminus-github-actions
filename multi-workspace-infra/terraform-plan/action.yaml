@@ -44,7 +44,7 @@ runs:
 #      shell: bash
     - name: Validate Inputs
       run: |
-        echo "${{join(github.event.inputs.*.required, ', ')}}"
+        echo "env | grep "INPUT_*"
       shell: bash
 #    - name: Validate Inputs
 #      env:
