@@ -45,7 +45,7 @@ runs:
     - name: Validate Inputs
       working-directory: ${{ env.SCRIPT_DIR }}
       run: |
-        echo "TEST: ${{ join(inputs.*, '/n') }}
+        echo "TEST: ${{ join(inputs.*.name, '/n') }}
       shell: bash
 #    - name: Validate Inputs
 #      env:
