@@ -38,12 +38,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-#    - name: Set Script Directory
-#      run: |
-#        echo "SCRIPT_DIR=-mod=vendor" >> $GITHUB_ENV
-#      shell: bash
+    - name: Set Script Directory
+      run: |
+        echo "SCRIPT_DIR=$(find ${{ github.action_path }} -type d -name shell-scripts)" >> $GITHUB_ENV
+      shell: bash
     - name: Validate Inputs
-      working-directory: $(find ${{ github.action_path }} -type d -name shell-scripts)
+      working-directory: ${{ env.SCRIPT_DIR }}
       run: |
         echo "TEST: ${{ join(inputs.*, '/n') }}
       shell: bash
