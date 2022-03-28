@@ -44,7 +44,7 @@ runs:
 #      shell: bash
     - name: Validate Inputs
       run: |
-        echo env | grep "INPUT_*"
+        env | grep "INPUT_*"
       shell: bash
 #    - name: Validate Inputs
 #      env:
