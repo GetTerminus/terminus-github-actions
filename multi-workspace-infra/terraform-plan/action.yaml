@@ -43,6 +43,8 @@ runs:
 #        echo "SCRIPT_DIR=$(find ${{ github.action_path }} -type d -name shell-scripts)" >> $GITHUB_ENV
 #      shell: bash
     - name: Validate Inputs
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
       run: echo "$GITHUB_CONTEXT"
       shell: bash
 #    - name: Validate Inputs
