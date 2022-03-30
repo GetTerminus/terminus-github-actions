@@ -65,6 +65,15 @@ runs:
 #        done
       run: |
         echo '${{ toJson(inputs) }}' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]"
+        declare -A myarray
+        while IFS="=" read -r key value
+        do
+            myarray[$key]="$value"
+        done < <(echo '${{ toJson(inputs) }}' | jq -r "to_entries|map(\"\(.key)=\(.value)\")|.[]" file)
+        for key in "${!myarray[@]}"
+        do
+            echo "$key = ${myarray[$key]}"
+        done
       shell: bash
 #    - name: Validate Inputs
 #      env:
