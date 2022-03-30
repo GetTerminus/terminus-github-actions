@@ -49,15 +49,16 @@ runs:
       env:
         GITHUB_CONTEXT: ${{ toJson(inputs) }}
       run: |
-        echo "Set Filter"
-        filter='to_entries | map("[\(.key)]=\(.value)") |
-          reduce .[] as $item ("associativeArray=("; . + ($item|@sh) + " ") + ")"'
-
-        echo "Set array string"
-        declare arrayAsString;
-        arrayAsString=$(cat "${{ toJson(inputs) }}" | jq --raw-output "${filter}")
-
-        echo "Create associativeArray"
+        json=$(
+        cat <<- EOF
+          {
+            "foo": "baru-1",
+            "su": "baru-2",
+            "dive": "baru-3"
+          }
+        EOF
+        )
+        arrayAsString=$(echo $json | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
         declare -A "$arrayAsString"
 
         echo "Print Array"
