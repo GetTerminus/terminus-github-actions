@@ -64,7 +64,7 @@ runs:
 #          echo "Value: ${associativeArray[$KEY]}"
 #        done
       run: |
-        echo ${{ toJson(inputs.required) }}
+        echo ${{ toJson(github.event.inputs) }}
         json=$(
         cat <<- EOF
           ${{ toJson(inputs) }}
