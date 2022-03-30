@@ -51,7 +51,7 @@ runs:
       run: |
         json=$(
         cat <<- EOF
-          ${{ toJson(inputs) }}
+        ${{ toJson(inputs) }}
         EOF
         )
         arrayAsString=$(echo $json | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
