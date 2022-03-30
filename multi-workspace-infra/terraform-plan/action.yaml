@@ -49,9 +49,6 @@ runs:
       env:
         GITHUB_CONTEXT: ${{ toJson(inputs) }}
       run: |
-#        echo "Json variable"
-#        json='${{ toJson(inputs) }}'
-
         echo "Set Filter"
         filter='to_entries | map("[\(.key)]=\(.value)") |
           reduce .[] as $item ("associativeArray=("; . + ($item|@sh) + " ") + ")"'
