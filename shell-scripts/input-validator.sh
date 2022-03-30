@@ -1,8 +1,7 @@
 #!/bin/bash
 
-source "./log-messages.sh"
-
 function validateInput() {
+  pwd
   debug "$1"
   local -n arr=$1
   error_count=0
