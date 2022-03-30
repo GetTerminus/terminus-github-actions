@@ -48,32 +48,32 @@ runs:
     - name: Validate Inputs
       env:
         GITHUB_CONTEXT: ${{ toJson(inputs) }}
-      run: |
-        json=$(
-        cat <<- EOF
-          ${{ toJson(inputs) }}
-        EOF
-        )
-        echo $json
-        arrayAsString=$(echo $json | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value|tostring)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
-        declare -A "$arrayAsString"
-
-        echo "Print Array"
-        for KEY in "${!associativeArray[@]}"; do
-          echo "Key: $KEY"
-          echo "Value: ${associativeArray[$KEY]}"
-        done
 #      run: |
-#        arrayAsString=$(echo '${{ toJson(inputs) }}' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]")
-#        declare -A myarray
-#        while IFS="=" read -r key value
-#        do
-#            myarray[$key]="$value"
-#        done < <(echo '${{ toJson(inputs) }}' | jq -r "to_entries|map(\"\(.key)=\(.value)\")|.[]" file)
-#        for key in "${!myarray[@]}"
-#        do
-#            echo "$key = ${myarray[$key]}"
+#        json=$(
+#        cat <<- EOF
+#          ${{ toJson(inputs) }}
+#        EOF
+#        )
+#        echo $json
+#        arrayAsString=$(echo $json | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value|tostring)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
+#        declare -A "$arrayAsString"
+#
+#        echo "Print Array"
+#        for KEY in "${!associativeArray[@]}"; do
+#          echo "Key: $KEY"
+#          echo "Value: ${associativeArray[$KEY]}"
 #        done
+      run: |
+        arrayAsString=$(echo '${{ toJson(inputs) }}' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]")
+        declare -A myarray
+        while IFS="=" read -r key value
+        do
+            myarray[$key]="$value"
+        done < <(echo '${{ toJson(inputs) }}' | jq -r "to_entries|map(\"\(.key)=\(.value)\")|.[]")
+        for key in "${!myarray[@]}"
+        do
+            echo "$key = ${myarray[$key]}"
+        done
       shell: bash
 #    - name: Validate Inputs
 #      env:
