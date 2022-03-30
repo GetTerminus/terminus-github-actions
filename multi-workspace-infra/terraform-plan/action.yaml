@@ -48,15 +48,30 @@ runs:
     - name: Validate Inputs
       env:
         GITHUB_CONTEXT: ${{ toJson(inputs) }}
+#      run: |
+#        json=$(
+#        cat <<- EOF
+#          ${{ toJson(inputs) }}
+#        EOF
+#        )
+#        echo $json
+#        arrayAsString=$(echo $json | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
+#        declare -A "$arrayAsString"
+#
+#        echo "Print Array"
+#        for KEY in "${!associativeArray[@]}"; do
+#          echo "Key: $KEY"
+#          echo "Value: ${associativeArray[$KEY]}"
+#        done
       run: |
-        json=$(
-        cat <<- EOF
-          ${{ toJson(inputs) }}
-        EOF
-        )
-        echo $json
-        arrayAsString=$(echo $json | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
-        declare -A "$arrayAsString"
+        json='${{ toJson(inputs) }}'
+
+        filter='to_entries | map("[\(.key)]=\(.value)") |
+          reduce .[] as $item ("associativeArray=("; . + ($item|@sh) + " ") + ")"'
+
+        arrayAsString;
+        arrayAsString=$(cat "$json" | jq --raw-output "${filter}")
+        local -A "$arrayAsString"
 
         echo "Print Array"
         for KEY in "${!associativeArray[@]}"; do
