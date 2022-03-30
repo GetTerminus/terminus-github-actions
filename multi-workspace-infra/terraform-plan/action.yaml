@@ -64,7 +64,7 @@ runs:
 #          echo "Value: ${associativeArray[$KEY]}"
 #        done
       run: |
-        echo "${{ toJson(inputs) }}" | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]"
+        echo '${{ toJson(inputs) }}' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]"
       shell: bash
 #    - name: Validate Inputs
 #      env:
