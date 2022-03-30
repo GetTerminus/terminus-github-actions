@@ -46,27 +46,14 @@ runs:
       env:
         GITHUB_CONTEXT: ${{ toJson(inputs) }}
       run: |
-        example () {
-          local filter filename='/path/to/file.json'
+        json=${{ toJson(inputs) }}
+        arrayAsString=$(echo $json | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
+        declare -A "$arrayAsString"
 
-          filter='to_entries | map("[\(.key | @sh)]=\(.value | @sh) ")
-          | "associativeArray=(" + add + ")"'
-
-          local -A "$(jq --raw-output --null-input --argfile file "$filename" \
-          "\$filename | ${filter}")"
-
-          filter='[to_entries[]|"["+(.key|@sh)+"]="+(.value|@sh)]|"("+join(" ")+")"'
-
-          local -A associativeArray=$(jq --join-output "${filter}" < "${filename}")
-
-          local key value
-
-          for key in "${!associativeArray[@]}"; do
-            value="${associativeArray["$key"]}"
-            printf '%s = %s' "$key" "$value"
-          done
-        }
-        example
+        for KEY in "${!arrayAsString[@]}"; do
+          echo "Key: $KEY"
+          echo "Value: ${arrayAsString[$KEY]}"
+        done
       shell: bash
 #    - name: Validate Inputs
 #      env:
