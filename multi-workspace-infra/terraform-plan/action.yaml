@@ -49,8 +49,8 @@ runs:
       env:
         GITHUB_CONTEXT: ${{ toJson(inputs) }}
       run: |
-        echo "Json variable"
-        json='${{ toJson(inputs) }}'
+#        echo "Json variable"
+#        json='${{ toJson(inputs) }}'
 
         echo "Set Filter"
         filter='to_entries | map("[\(.key)]=\(.value)") |
@@ -58,7 +58,7 @@ runs:
 
         echo "Set array string"
         declare arrayAsString;
-        arrayAsString=$(cat "$json" | jq --raw-output "${filter}")
+        arrayAsString=$(cat "${{ toJson(inputs) }}" | jq --raw-output "${filter}")
 
         echo "Create associativeArray"
         declare -A "$arrayAsString"
