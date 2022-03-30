@@ -49,16 +49,21 @@ runs:
       env:
         GITHUB_CONTEXT: ${{ toJson(inputs) }}
       run: |
-        echo "Step 1"
-        json=$(
-          cat <<- EOF
-          ${{ toJson(inputs) }}
-        EOF
-        )
-        echo "Step 2"
-        arrayAsString=$(echo $json | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
+        echo "Json variable"
+        json='${{ toJson(inputs) }}'
+
+        echo "Set Filter"
+        filter='to_entries | map("[\(.key)]=\(.value)") |
+          reduce .[] as $item ("associativeArray=("; . + ($item|@sh) + " ") + ")"'
+
+        echo "Set array string"
+        declare arrayAsString;
+        arrayAsString=$(cat "$json" | jq --raw-output "${filter}")
+
+        echo "Create associativeArray"
         declare -A "$arrayAsString"
 
+        echo "Print Array"
         for KEY in "${!arrayAsString[@]}"; do
           echo "Key: $KEY"
           echo "Value: ${arrayAsString[$KEY]}"
