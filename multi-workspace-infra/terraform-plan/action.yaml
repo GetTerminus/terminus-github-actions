@@ -64,23 +64,7 @@ runs:
 #          echo "Value: ${associativeArray[$KEY]}"
 #        done
       run: |
-        json=$(
-        cat <<- EOF
-          ${{ toJson(inputs) }}
-        EOF
-        )
-
-        filter='to_entries | map("[\(.key)]=\(.value)") |
-          reduce .[] as $item ("associativeArray=("; . + ($item|@sh) + " ") + ")"'
-
-        arrayAsString=$(echo $json | jq --raw-output "${filter}")
-        declare -A "$arrayAsString"
-
-        echo "Print Array"
-        for KEY in "${!associativeArray[@]}"; do
-          echo "Key: $KEY"
-          echo "Value: ${associativeArray[$KEY]}"
-        done
+        echo ${{ toJson(inputs) }} | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]"
       shell: bash
 #    - name: Validate Inputs
 #      env:
