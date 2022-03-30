@@ -69,9 +69,9 @@ runs:
         filter='to_entries | map("[\(.key)]=\(.value)") |
           reduce .[] as $item ("associativeArray=("; . + ($item|@sh) + " ") + ")"'
 
-        arrayAsString;
+        declare -a arrayAsString();
         arrayAsString=$(cat "$json" | jq --raw-output "${filter}")
-        local -A "$arrayAsString"
+        declare -A "$arrayAsString"
 
         echo "Print Array"
         for KEY in "${!associativeArray[@]}"; do
