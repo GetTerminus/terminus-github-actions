@@ -50,7 +50,7 @@ runs:
         GITHUB_CONTEXT: ${{ toJson(inputs) }}
       run: |
         echo '${{ toJson(inputs) }}'
-        arrayAsString=$(echo $json | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
+        arrayAsString=$(echo '${{ toJson(inputs) }}' | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
         declare -A "$arrayAsString"
 
         echo "Print Array"
