@@ -46,7 +46,7 @@ runs:
       env:
         GITHUB_CONTEXT: ${{ toJson(inputs) }}
       run: |
-        json=${{ toJson(inputs) }}
+        json=${{ env.GITHUB_CONTEXT }}
         arrayAsString=$(echo $json | jq --raw-output '. | to_entries | map("[\(.key)]=\(.value)") | reduce .[] as $item ("associativeArray=("; . + $item + " ") + ")"')
         declare -A "$arrayAsString"
 
