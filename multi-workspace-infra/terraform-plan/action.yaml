@@ -51,11 +51,7 @@ runs:
       run: |
         json=$(
         cat <<- EOF
-          {
-            "foo": "baru-1",
-            "su": "baru-2",
-            "dive": "baru-3"
-          }
+          ${{ toJson(inputs) }}
         EOF
         )
         echo $json
