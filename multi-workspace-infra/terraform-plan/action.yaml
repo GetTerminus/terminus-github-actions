@@ -64,12 +64,17 @@ runs:
 #          echo "Value: ${associativeArray[$KEY]}"
 #        done
       run: |
-        arrayAsString=$(echo '${{ toJson(inputs) }}' | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]")
+        json=$(
+        cat <<- EOF
+          ${{ toJson(inputs) }}
+        EOF
+        )
+        echo $json
         declare -A myarray
         while IFS="=" read -r key value
         do
             myarray[$key]="$value"
-        done < <(echo '${{ toJson(inputs) }}' | jq -r "to_entries|map(\"\(.key)=\(.value)\")|.[]")
+        done < <(echo $json | jq -r "to_entries|map(\"\(.key)=\(.value)\")|.[]")
         for key in "${!myarray[@]}"
         do
             echo "$key = ${myarray[$key]}"
