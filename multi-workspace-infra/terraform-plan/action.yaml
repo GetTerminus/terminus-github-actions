@@ -64,12 +64,16 @@ runs:
 #          echo "Value: ${associativeArray[$KEY]}"
 #        done
       run: |
-        json='${{ toJson(inputs) }}'
+        json=$(
+        cat <<- EOF
+          ${{ toJson(inputs) }}
+        EOF
+        )
 
         filter='to_entries | map("[\(.key)]=\(.value)") |
           reduce .[] as $item ("associativeArray=("; . + ($item|@sh) + " ") + ")"'
 
-        arrayAsString=$(cat "$json" | jq --raw-output "${filter}")
+        arrayAsString=$(echo $json | jq --raw-output "${filter}")
         declare -A "$arrayAsString"
 
         echo "Print Array"
