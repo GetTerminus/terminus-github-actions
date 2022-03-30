@@ -74,6 +74,7 @@ runs:
         echo "Print Array"
         for KEY in "${!associativeArray[@]}"; do
           echo "Key: $KEY"
+          echo "Required: ${{ inputs.$KEY.required }}"
           echo "Value: ${associativeArray[$KEY]}"
         done
       shell: bash
