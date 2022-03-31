@@ -7,16 +7,22 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set SCRIPT_SOURCE
+      run: |
+        cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
+        dir=$(pwd)
+        echo "SCRIPT_SOURCE=$dir" >> $GITHUB_ENV
+      shell: bash
     - name: Validate Inputs
+      working-directory: ${{ env.SCRIPT_SOURCE }}
       env:
         PULL_ACCESS_TOKEN: ${{ inputs.pull_access_token }}
       run: |
-        cd ${{ github.action_path }}
-        source ../../shell-scripts/input-validator.sh
-        
+        source input-validator.sh
+
         declare -A inputs
         inputs[pull_access_token]="$PULL_ACCESS_TOKEN"
-        
+
         validateInput inputs
       shell: bash
     - name: Deploy EKS Infra
@@ -27,4 +33,3 @@ runs:
         repo: GetTerminus/eks-infra
         ref: master
         inputs: '{"environment": "all", "use_delivery_bot": "false"}'
-      

@@ -11,18 +11,24 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set SCRIPT_SOURCE
+      run: |
+        cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
+        dir=$(pwd)
+        echo "SCRIPT_SOURCE=$dir" >> $GITHUB_ENV
+      shell: bash
     - name: Validate Inputs
+      working-directory: ${{ env.SCRIPT_SOURCE }}
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
         TERRAFORM_VERSION: ${{ inputs.terraform_version }}
       run: |
-        cd ${{ github.action_path }}
-        source ../../shell-scripts/input-validator.sh
-        
+        source input-validator.sh
+
         declare -A inputs
         inputs[terraform_version]="$TERRAFORM_VERSION"
         inputs[ssh_key]="$SSH_KEY"
-        
+
         validateInput inputs
       shell: bash
     - name: Install SSH Key
@@ -56,4 +62,3 @@ runs:
       run: |
         terraform apply -lock=true -lock-timeout=0s -input=false tfplan
       shell: bash
-      

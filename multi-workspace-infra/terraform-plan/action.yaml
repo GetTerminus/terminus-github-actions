@@ -38,15 +38,21 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set SCRIPT_SOURCE
+      run: |
+        cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
+        dir=$(pwd)
+        echo "SCRIPT_SOURCE=$dir" >> $GITHUB_ENV
+      shell: bash
     - name: Validate Inputs
+      working-directory: ${{ env.SCRIPT_SOURCE }}
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
         TERRAFORM_VERSION: ${{ inputs.terraform_version }}
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
-        cd ${{ github.action_path }}
-        source ../../shell-scripts/input-validator.sh
+        source input-validator.sh
 
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
