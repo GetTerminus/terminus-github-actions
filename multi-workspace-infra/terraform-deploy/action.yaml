@@ -11,16 +11,22 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set SCRIPT_SOURCE
+      run: |
+        cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
+        dir=$(pwd)
+        echo "SCRIPT_SOURCE=$dir" >> $GITHUB_ENV
+      shell: bash
     - name: Validate Inputs
+      working-directory: ${{ env.SCRIPT_SOURCE }}
       env:
         GH_DEPLOYMENT_ACCESS_TOKEN: ${{ inputs.gh_deployment_access_token }}
       run: |
-        cd ${{ github.action_path }}
-        source ../../shell-scripts/input-validator.sh
-        
+        source input-validator.sh
+
         declare -A inputs
         inputs[gh_deployment_access_token]="$GH_DEPLOYMENT_ACCESS_TOKEN"
-        
+
         validateInput inputs
       shell: bash
     - name: Create Sequential Deployments
