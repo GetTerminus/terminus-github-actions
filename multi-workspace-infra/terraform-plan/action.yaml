@@ -43,7 +43,7 @@ runs:
         cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
         pwd
         echo "TEST1"
-        echo "($pwd)"
+        echo "$PWD"
         echo "($pwd)" >> $GITHUB_PATH
         echo "TEST2s"
         echo $GITHUB_PATH
