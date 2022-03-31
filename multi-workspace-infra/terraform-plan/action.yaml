@@ -53,7 +53,7 @@ runs:
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
-        source = ${{ env.SCRIPT_SOURCE }}/input-validator.sh
+        source ${{ env.SCRIPT_SOURCE }}/input-validator.sh
 
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
