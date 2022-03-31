@@ -43,9 +43,8 @@ runs:
         cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
         pwd
         echo "TEST1"
-        echo "$PWD"
-        echo "($pwd)" >> $GITHUB_PATH
-        echo "TEST2s"
+        echo "$PWD" >> $GITHUB_PATH
+        echo "TEST2"
         echo $GITHUB_PATH
       shell: bash
     - name: Validate Inputs
