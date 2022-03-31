@@ -48,9 +48,6 @@ runs:
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
-        cd ${{ github.action_path }}
-        source ../../shell-scripts/input-validator.sh
-
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
         inputs[terraform_version]="$TERRAFORM_VERSION"
