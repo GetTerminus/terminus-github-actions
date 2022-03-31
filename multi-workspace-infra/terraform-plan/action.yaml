@@ -42,7 +42,7 @@ runs:
       run: |
         cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
         dir=$(pwd)
-        echo "$dir" >> $GITHUB_ENV
+        echo "SCRIPT_SOURCE=$dir" >> $GITHUB_ENV
         echo $SCRIPT_SOURCE
       shell: bash
     - name: Validate Inputs
