@@ -1,4 +1,5 @@
 #!/bin/bash
+source log-messages.sh
 
 function validateInput() {
   debug "$1"
