@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pwd
+source log-messages.sh
 
 function validateInput() {
   debug "$1"
