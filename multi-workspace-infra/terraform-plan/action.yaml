@@ -43,7 +43,8 @@ runs:
         cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
         dir=$(pwd)
         echo "SCRIPT_SOURCE=$dir" >> $GITHUB_ENV
-        echo $SCRIPT_SOURCE
+        echo "TEST"
+        echo ${{ env.SCRIPT_SOURCE }}
       shell: bash
     - name: Validate Inputs
       env:
@@ -52,7 +53,7 @@ runs:
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
-        source = $SCRIPT_SOURCE/input-validator.sh
+        source = ${{ env.SCRIPT_SOURCE }}/input-validator.sh
 
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
