@@ -11,11 +11,12 @@ function validateInput() {
       if [ -z "${arr[${key}]}" ]
       then
         error_count=$((error_count+1))
-        error "${key} is empty." "For a list of required inputs, please check the corresponding directory in: https://github.com/GetTerminus/terminus-github-actions"
+        warning "${key} is empty." "${key} is empty."
       fi
     done
   if [ "$error_count" -gt 0 ]
   then
+    error "Missing Required Inputs" "Missing required inputs. For a list of required inputs, please check the corresponding directory in: https://github.com/GetTerminus/terminus-github-actions"
     exit 1
   else
     success "Input validation passed!"
