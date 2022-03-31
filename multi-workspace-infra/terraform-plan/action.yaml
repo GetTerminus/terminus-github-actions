@@ -42,6 +42,7 @@ runs:
       run: |
         cd ${{ github.action_path }}/../../shell-scripts/
         pwd
+        echo "Version: ${{ github.action_ref }}"
       shell: bash
     - name: Validate Inputs
       env:
