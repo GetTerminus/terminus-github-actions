@@ -40,10 +40,8 @@ runs:
   steps:
     - name: Set GITHUB_PATH
       run: |
-        find / -type d -name 'shell-scripts'
-        cd ${{ github.action_path }}/../../shell-scripts/
-        pwd
-        echo "Version: ${{ github.action_ref }}"
+        ${{ tojson(github) }}
+        cd ${{ github.action_path }}/../../shell-scripts/ | echo "$(pwd)" >>> GITHUB_PATH
       shell: bash
     - name: Validate Inputs
       env:
