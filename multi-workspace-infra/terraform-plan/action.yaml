@@ -40,11 +40,7 @@ runs:
   steps:
     - name: Set SCRIPT_SOURCE
       run: |
-        cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
-        dir=$(pwd)
-        echo "SCRIPT_SOURCE=$dir" >> $GITHUB_ENV
-        echo "TEST"
-        echo ${{ env.SCRIPT_SOURCE }}
+        echo "SCRIPT_SOURCE=$(cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts) | echo "($pwd)")" >> $GITHUB_ENV
       shell: bash
     - name: Validate Inputs
       working-directory: ${{ env.SCRIPT_SOURCE }}

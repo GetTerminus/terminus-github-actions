@@ -11,17 +11,25 @@ if [ -n "${ECHO+x}" ]; then
 fi
 
 error () {
+  echo ""
   echo "::error title=$1::$2"
+  echo ""
 }
 
 warning () {
+  echo ""
   echo "::warning title=$1::$2"
+  echo ""
 }
 
 success () {
+  echo ""
   echo -e "\033[32;1mSUCCESS:\033[0m $1"
+  echo ""
 }
 
 info () {
+  echo ""
   echo -e "\033[34;1mINFO:\033[0m $1"
+  echo ""
 }
