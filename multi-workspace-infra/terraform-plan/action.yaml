@@ -40,8 +40,10 @@ runs:
   steps:
     - name: Set GITHUB_PATH
       run: |
-        ${{ tojson(github) }}
-        cd ${{ github.action_path }}/../../shell-scripts/ | echo "$(pwd)" >>> GITHUB_PATH
+        echo "/home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts" >> $GITHUB_PATH
+        echo "GITHUB_PATH: $$GITHUB_PATH"
+        cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
+        pwd
       shell: bash
     - name: Validate Inputs
       env:
@@ -56,7 +58,7 @@ runs:
         inputs[tf_workspace]="$TF_WORKSPACE"
         inputs[github_token]="$GITHUB_TOKEN"
 
-        inputValidator.sh validateInput inputs
+        validateInput inputs
       shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
