@@ -46,6 +46,9 @@ runs:
         echo "$PWD" >> $GITHUB_PATH
         echo "TEST2"
         echo $GITHUB_PATH
+        echo "${{ github.action_path }}" >> $GITHUB_PATH
+        echo "TEST3"
+        echo $GITHUB_PATH
       shell: bash
     - name: Validate Inputs
       env:
