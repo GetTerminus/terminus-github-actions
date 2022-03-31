@@ -40,8 +40,7 @@ runs:
   steps:
     - name: Set GITHUB_PATH
       run: |
-        echo "${{ github.action_path }}/../../shell-scripts/" >> $GITHUB_PATH
-        echo $GITHUB_PATH
+        echo "/home/runner/work/_actions/GetTerminus/terminus-github-actions/${{ github.action_ref }}/shell-scripts" >> $GITHUB_PATH
       shell: bash
     - name: Validate Inputs
       env:
