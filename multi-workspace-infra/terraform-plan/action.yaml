@@ -38,17 +38,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set GITHUB_PATH
+    - name: Set SCRIPT_SOURCE
       run: |
-        cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
-        pwd
-        echo "TEST1"
-        echo "$PWD" >> $GITHUB_PATH
-        echo "TEST2"
-        echo $GITHUB_PATH
-        echo "${{ github.action_path }}" >> $GITHUB_PATH
-        echo "TEST3"
-        echo $GITHUB_PATH
+        echo "SCRIPT_SOURCE=$(cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts | echo "$PWD")" >> $GITHUB_ENV
+        echo $SCRIPT_SOURCE
       shell: bash
     - name: Validate Inputs
       env:
@@ -57,6 +50,8 @@ runs:
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
+        source = $SCRIPT_SOURCE/input-validator.sh
+
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
         inputs[terraform_version]="$TERRAFORM_VERSION"
