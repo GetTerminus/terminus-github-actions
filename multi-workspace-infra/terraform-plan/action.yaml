@@ -40,8 +40,12 @@ runs:
   steps:
     - name: Set GITHUB_PATH
       run: |
-        cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts | echo "($pwd)" >> $GITHUB_PATH
-        echo "TEST"
+        cd /home/runner/work/_actions/GetTerminus/terminus-github-actions/*/shell-scripts
+        pwd
+        echo "TEST1"
+        echo "($pwd)"
+        echo "($pwd)" >> $GITHUB_PATH
+        echo "TEST2s"
         echo $GITHUB_PATH
       shell: bash
     - name: Validate Inputs
