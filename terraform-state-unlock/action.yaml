@@ -49,6 +49,6 @@ runs:
       run: |
         terraform version
         terraform init -lock=false -input=false
-        terraform select ${{ inputs.terraform_workspace }}
+        terraform workspace select ${{ inputs.terraform_workspace }}
         terraform force-unlock -force ${{ inputs.lock_id }}
       shell: bash
