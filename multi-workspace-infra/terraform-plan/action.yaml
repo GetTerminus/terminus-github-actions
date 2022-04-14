@@ -98,6 +98,7 @@ runs:
       run: |
         terraform version
         terraform init -lock=false -input=false
+        terraform destroy module.eks.data.http.wait_for_cluster[0]
       shell: bash
     - name: Post TF Init Comment
       # TODO: Add in the below code to all plan commenter if statements when github adds in the functionality
