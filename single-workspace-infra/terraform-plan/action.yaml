@@ -31,12 +31,12 @@ runs:
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
-        
+
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
         inputs[terraform_version]="$TERRAFORM_VERSION"
         inputs[github_token]="$GITHUB_TOKEN"
-        
+
         validateInput inputs
       shell: bash
     - name: Install SSH Key
@@ -51,7 +51,7 @@ runs:
         terraform_version: ${{ inputs.terraform_version }}
     - name: Terraform Format Check
       id: fmt
-      run: terraform fmt -check -recursive || echo "::set-output name=exitcode_continue_on_error::$?" 
+      run: terraform fmt -check -recursive || echo "::set-output name=exitcode_continue_on_error::$?"
       #TODO: Uncomment once github supports it
       #continue-on-error: true
       shell: bash
@@ -69,7 +69,7 @@ runs:
       id: init
       run: |
         terraform version
-        terraform init -lock=false -input=false
+        terraform init -lock=false -input=false -upgrade
       shell: bash
     - name: Post TF Init Comment
       # TODO: Add in the below code to all plan commenter if statements when github adds in the functionality
@@ -122,4 +122,3 @@ runs:
         commenter_input: tfplan
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
         terraform_version: ${{ inputs.terraform_version }}
-        
