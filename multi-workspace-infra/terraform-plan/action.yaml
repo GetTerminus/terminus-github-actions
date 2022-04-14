@@ -98,6 +98,7 @@ runs:
       run: |
         terraform version
         terraform init -lock=false -input=false
+        terraform force-unlock
         terraform state rm module.eks.data.http.wait_for_cluster[0]
       shell: bash
     - name: Post TF Init Comment

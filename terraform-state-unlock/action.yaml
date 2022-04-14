@@ -10,6 +10,9 @@ inputs:
   lock_id:
     description: "[lock_id] (e.g. 8b08ccb1-f514-e9c5-7271-88f5c13c3155) ID of the TF lock to unlock."
     required: true
+  terraform_workspace:
+    description: "[terraform_workspace] (e.g. ninja) TF Workspace name."
+    required: true
 
 runs:
   using: "composite"
@@ -19,15 +22,17 @@ runs:
         SSH_KEY: ${{ inputs.ssh_key }}
         TERRAFORM_VERSION: ${{ inputs.terraform_version }}
         LOCK_ID: ${{ inputs.lock_id }}
+        TF_WORKSPACE_NAME: ${{ inputs.tf_workspace }}
       run: |
         cd ${{ github.action_path }}
         source ../shell-scripts/input-validator.sh
-        
+
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
         inputs[terraform_version]="$TERRAFORM_VERSION"
         inputs[lock_id]="$LOCK_ID"
-        
+        inputs[tf_workspace]="$TF_WORKSPACE_NAME"
+
         validateInput inputs
       shell: bash
     - name: Install SSH Key
@@ -44,6 +49,6 @@ runs:
       run: |
         terraform version
         terraform init -lock=false -input=false
+        terraform select ${{ inputs.terraform_workspace }}
         terraform force-unlock -force ${{ inputs.lock_id }}
       shell: bash
-        
