@@ -116,7 +116,6 @@ runs:
       if: ${{ inputs.tf_create_workspace != 'true' }}
       run: |
         terraform workspace select ${{ inputs.tf_workspace }}
-        terraform state rm module.eks.data.http.wait_for_cluster[0]
       shell: bash
     - name: TF Plan - Create Workspace
       if: ${{ inputs.tf_create_workspace == 'true' }}

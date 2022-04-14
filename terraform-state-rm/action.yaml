@@ -10,6 +10,9 @@ inputs:
   resource_address:
     description: "[resource_name] [required] (e.g. datadog_monitor.platform-browser-identity-status). Type and name of the resource that will be removed in dot notation."
     required: true
+  terraform_workspace:
+    description: "[terraform_workspace] [required] (e.g. ninja). TF Workspace name."
+    required: true
   dry_run:
     description: "[dry_run] [required] (i.e. true/false). If you wish to skip updating the TF State File."
     required: true
@@ -24,16 +27,18 @@ runs:
         TERRAFORM_VERSION: ${{ inputs.terraform_version }}
         RESOURCE_ADDRESS: ${{ inputs.resource_address }}
         DRY_RUN: ${{ inputs.dry_run }}
+        TERRAFORM_WORKSPACE: ${{ inputs.terraform_workspace }}
       run: |
         cd ${{ github.action_path }}
         source ../shell-scripts/input-validator.sh
-        
+
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
         inputs[terraform_version]="$TERRAFORM_VERSION"
         inputs[resource_address]="$RESOURCE_ADDRESS"
+        inputs[terraform_workspace]="$TERRAFORM_WORKSPACE"
         inputs[dry_run]="$DRY_RUN"
-        
+
         validateInput inputs
       shell: bash
     - name: Install SSH Key
@@ -50,6 +55,7 @@ runs:
       run: |
         terraform version
         terraform init -lock=false
+        terraform workspace select ${{ inputs.terraform_workspace }}
       shell: bash
     - name: Dry Run
       if: ${{ inputs.dry_run == 'true' }}
