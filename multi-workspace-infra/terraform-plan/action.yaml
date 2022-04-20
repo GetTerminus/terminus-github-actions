@@ -35,7 +35,7 @@ inputs:
     required: false
     default: 'false'
   checkout_ref:
-    description: 'A checkout-able object. Defaults to the PR's SHA'
+    description: 'A checkout-able object. Blank defaults to the Action default behavior'
     required: false
     default: ''
 
