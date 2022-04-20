@@ -126,6 +126,7 @@ runs:
     - name: TF Plan - Validate
       id: validate
       run: |
+        terraform state replace-provider -auto-approve hashicorp/github integrations/github
         terraform validate
         terraform workspace show
       shell: bash
