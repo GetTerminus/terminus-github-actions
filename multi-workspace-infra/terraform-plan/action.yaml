@@ -69,7 +69,7 @@ runs:
       run: |
         helm repo add terminus https://getterminus.jfrog.io/artifactory/default-helm/ --username developer --password ${{ inputs.artifactory_read_access_token }}
         helm repo update
-        helm dependency update ${{ inputs.artifactory_helm_chart_path }}
+        ls helm/charts | xargs helm dependency update
       shell: bash
     - name: HashiCorp - Setup Terraform
       uses: hashicorp/setup-terraform@v1.2.1
