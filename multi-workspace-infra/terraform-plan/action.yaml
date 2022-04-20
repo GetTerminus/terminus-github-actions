@@ -67,7 +67,7 @@ runs:
     - name: Pull
       uses: actions/checkout@v2
       with:
-        ref: ${{ github.event.deployment.ref }}
+        ref: ${{ inputs.checkout_ref }}
         lfs: true
     - name: Helm Update
       if: ${{ inputs.artifactory_enabled == 'true' }}
