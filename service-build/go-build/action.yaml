@@ -72,7 +72,7 @@ runs:
       uses: aws-actions/amazon-ecr-login@v1
     - name: Compile
       working-directory: ./cmd/${{ inputs.cmd_to_build }}
-      run: go build -o ./bin/${{ inputs.cmd_to_build }} -mod vendor main.go
+      run: go build -installsuffix cgo
       shell: bash
     - name: Build & Push Intake Lambda Image
       env:
