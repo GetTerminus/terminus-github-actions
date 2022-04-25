@@ -16,6 +16,9 @@ inputs:
   aws_secret_key:
     description: 'AWS Secret Key for ECR Image Push.'
     required: true
+  artifactory_read_token:
+    description: 'Read access for artifactory.'
+    required: false
 
 runs:
   using: "composite"
@@ -70,6 +73,13 @@ runs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+    - name: Login to Artifactory
+      if: ${{ inputs.artifactory_read_token }}
+      uses: docker/login-action@v1
+      with:
+        registry: getterminus.jfrog.io
+        username: developer
+        password: ${{ inputs.artifactory_read_token }}
     - name: Compile
       working-directory: ./cmd/${{ inputs.cmd_to_build }}/
       run: go build -a -installsuffix cgo -o ./bin/${{ inputs.cmd_to_build }}-exe -mod vendor main.go
