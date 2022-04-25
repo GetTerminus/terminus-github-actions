@@ -10,7 +10,13 @@ inputs:
   cmd_to_build:
     description: '[string] cmd to build.'
     required: true
-    
+  aws_access_key:
+    description: 'AWS Access Key for ECR Image Push.'
+    required: true
+  aws_secret_key:
+    description: 'AWS Secret Key for ECR Image Push.'
+    required: true
+
 runs:
   using: "composite"
   steps:
@@ -19,15 +25,19 @@ runs:
         SSH_KEY: ${{ inputs.ssh_key }}
         GO_VERSION: ${{ inputs.go_version }}
         CMD_TO_BUILD: ${{ inputs.cmd_to_build }}
+        AWS_ACCESS_KEY: ${{ inputs.aws_access_key }}
+        AWS_SECRET_KEY: ${{ inputs.aws_secret_key }}
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
-        
+
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
         inputs[go_version]="$GO_VERSION"
         inputs[cmd_to_build]="$CMD_TO_BUILD"
-        
+        inputs[aws_access_key]="$AWS_ACCESS_KEY"
+        inputs[aws_secret_key]="$AWS_SECRET_KEY"
+
         validateInput inputs
       shell: bash
     - name: Set Environmental Variables
@@ -42,25 +52,41 @@ runs:
       uses: webfactory/ssh-agent@v0.4.1
       with:
         ssh-private-key: ${{ inputs.ssh_key }}
-    - name: Install Go
+    - name: Pull
+      uses: actions/checkout@v2
+    - name: Setup Go
       uses: actions/setup-go@v2
       with:
         go-version: ${{ inputs.go_version }}
-    - name: Pull
-      uses: actions/checkout@v2
-      with:
-        lfs: true
-    - name: Build
-      run: |
-        cd "./cmd/${{ inputs.cmd_to_build }}"
-        go build -installsuffix cgo
-        mkdir -p "../../build/bins"
-        mv "${{ inputs.cmd_to_build }}" "../../build/bins/${{ inputs.cmd_to_build }}"
+    - name: Show Go Version
+      run: go version
       shell: bash
-    - name: Store
-      uses: actions/upload-artifact@v2
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        name: go-build
-        path: build/bins
-        retention-days: 1
-        
+        aws-access-key-id: ${{ inputs.aws_access_key }}
+        aws-secret-access-key: ${{ inputs.aws_secret_key }}
+        aws-region: us-east-1
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    - name: Compile
+      working-directory: ./cmd/${{ inputs.cmd_to_build }}
+      run: go build -installsuffix cgo
+      shell: bash
+    - name: Build & Push Intake Lambda Image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ github.repository }}
+        IMAGE_TAG: ${{ inputs.cmd_to_build }}-${{ github.sha }}
+      working-directory: ./cmd/${{ inputs.cmd_to_build }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile ./bin/
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      shell: bash
+    - name: Clean Up
+      if: always()
+      run: |
+        docker logout ${{ steps.login-ecr.outputs.registry }}
+        docker system prune --volumes --force
+      shell: bash
