@@ -72,7 +72,7 @@ runs:
       uses: aws-actions/amazon-ecr-login@v1
     - name: Compile
       working-directory: ./cmd/${{ inputs.cmd_to_build }}
-      run: go build -a -installsuffix cgo -o ./bin/${{ inputs.cmd_to_build }}-exe -mod vendor main.go
+      run: CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o ./bin/intake-lambda-exe -mod vendor main.go
       shell: bash
     - name: Build & Push Intake Lambda Image
       env:
