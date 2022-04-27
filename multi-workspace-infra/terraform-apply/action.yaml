@@ -70,7 +70,6 @@ runs:
         datadog-ci git-metadata upload
       shell: bash
     - name: Deployment Pending
-      if:  ${{ inputs.use_delivery_bot == 'true' }}
       uses: deliverybot/deployment-status@v1
       with:
         state: pending
@@ -132,13 +131,13 @@ runs:
         app_key: ${{ env.DATADOG_APP_KEY }}
         test_search_query: 'tag:managedby:*${{ env.GITHUB_REPOSITORY }}*'
     - name: Deployment Success
-      if: ${{ success() && inputs.use_delivery_bot == 'true' }}
+      if: success()
       uses: deliverybot/deployment-status@v1
       with:
         state: success
         token: ${{ github.token }}
     - name: Deployment Failure
-      if: ${{ failure() && inputs.use_delivery_bot == 'true' }}
+      if: failure()
       uses: deliverybot/deployment-status@v1
       with:
         state: failure
