@@ -155,7 +155,7 @@ runs:
         workflow: ${{ inputs.cypress_test_workflow }}
         repo: GetTerminus/${{ inputs.cypress_test_repo }}
         token: ${{ inputs.cypress_test_token }}
-        inputs: '{ "environment": ${{ inputs.cypress_test_env }} }'
+        inputs: '{ "environment": "${{ inputs.cypress_test_env }}" }'
     - name: Deployment Success
       if: success()
       uses: deliverybot/deployment-status@v1
