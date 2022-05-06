@@ -87,11 +87,11 @@ runs:
         datadog-ci git-metadata upload
       shell: bash
     - name: Deployment Pending
-      if:  ${{ inputs.use_delivery_bot == 'true' }}
-      uses: deliverybot/deployment-status@v1
+      uses: chrnorm/deployment-status@releases/v1
       with:
-        state: pending
         token: ${{ github.token }}
+        state: pending
+        deployment_id: ${{ github.event.deployment.id }}
     - name: Helm Update
       if: ${{ inputs.artifactory_enabled == 'true' }}
       run: |
@@ -158,14 +158,16 @@ runs:
         token: ${{ inputs.cypress_test_token }}
         inputs: '{ "environment": "${{ inputs.cypress_test_env }}" }'
     - name: Deployment Success
-      if: ${{ success() && inputs.use_delivery_bot == 'true' }}
-      uses: deliverybot/deployment-status@v1
+      if: success()
+      uses: chrnorm/deployment-status@releases/v1
       with:
+        token: ${{ github.token }}
         state: success
-        token: ${{ github.token }}
-    - name: Deployment Failure
-      if: ${{ failure() && inputs.use_delivery_bot == 'true' }}
-      uses: deliverybot/deployment-status@v1
+        deployment_id: ${{ github.event.deployment.id }}
+    - name: Deployment Success
+      if: failure()
+      uses: chrnorm/deployment-status@releases/v1
       with:
-        state: failure
         token: ${{ github.token }}
+        state: failure
+        deployment_id: ${{ github.event.deployment.id }}
