@@ -42,6 +42,7 @@ inputs:
   use_delivery_bot:
     description: '[bool] (i.e. true/false) Whether or not to run the delivery bot deployment status steps.'
     required: false
+    default: 'true'
   dd_trigger_synthetic_tests:
     description: '[bool] (i.e. true/false) Enable the tf plan commenter.'
     required: false
