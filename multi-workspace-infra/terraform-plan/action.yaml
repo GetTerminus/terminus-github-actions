@@ -23,10 +23,6 @@ inputs:
   artifactory_helm_chart_path:
     description: '[string] Path to helm chart for artifactory.'
     required: false
-  enable_plan_commenter:
-    description: '[bool] (i.e. true/false) Enable the tf plan commenter.'
-    required: false
-    default: 'true'
   tf_create_workspace:
     description: '[bool] (i.e. true/false) If set to true, workspace will be
                   created based on tf_workspace input variable. This should only be run when
@@ -83,12 +79,10 @@ runs:
     - name: Terraform Format Check
       id: fmt
       run: |
-        terraform fmt -check -recursive || echo "::set-output name=exitcode_continue_on_error::$?"
-      #TODO: Uncomment once github supports it
-      #continue-on-error: true
+        terraform fmt -check -recursive
       shell: bash
     - name: Post TF Format Check
-      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && && (steps.fmt.outcome == 'success' || steps.fmt.outcome == 'failure') }}
       uses: GetTerminus/terraform-pr-commenter@master
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
@@ -105,9 +99,7 @@ runs:
         terraform init -lock=false -input=false
       shell: bash
     - name: Post TF Init Comment
-      # TODO: Add in the below code to all plan commenter if statements when github adds in the functionality
-      # (steps.init.outcome == 'success' || steps.init.outcome == 'failure')
-      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && (steps.init.outcome == 'success' || steps.init.outcome == 'failure') }}
       uses: GetTerminus/terraform-pr-commenter@master
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
@@ -135,7 +127,7 @@ runs:
         terraform workspace show
       shell: bash
     - name: Post TF Validate Comment
-      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && (steps.validate.outcome == 'success' || steps.validate.outcome == 'failure') }}
       uses: GetTerminus/terraform-pr-commenter@master
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
@@ -151,7 +143,7 @@ runs:
         terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=false -input=false -out=tfplan
       shell: bash
     - name: Post TF Plan Comment
-      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable_plan_commenter == 'true' }}
+      if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure') }}
       uses: GetTerminus/terraform-pr-commenter@master
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
