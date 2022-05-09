@@ -108,7 +108,9 @@ runs:
     - name: TF Plan - Run
       id: plan
       run: |
-        terraform plan -lock=false -input=false -out=tfplan
+        OUTPUT=$(terraform plan -lock=false -input=false -out=tfplan 2>&1)
+        echo "::set-output name=plan-output::${OUTPUT::65000}"
+        echo "::set-output name=exitcode::$?"
       shell: bash
     - name: Post TF Plan Comment
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable_plan_commenter == 'true' }}
@@ -119,7 +121,7 @@ runs:
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
       with:
         commenter_type: plan
-        commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        commenter_input: ${{ steps.plan.outputs.plan-output }}
         commenter_plan_path: tfplan
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
         terraform_version: ${{ inputs.terraform_version }}
