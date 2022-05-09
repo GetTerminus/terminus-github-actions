@@ -59,7 +59,8 @@ runs:
       run: |
         terraform version
         terraform init -lock=false -input=false
-        terraform select ${{ inputs.tf_workspace }}
+        terraform workspace select ${{ inputs.tf_workspace }}
+        terraform workspace show
       shell: bash
     - name: Dry Run
       if: ${{ inputs.dry_run == 'true' }}
