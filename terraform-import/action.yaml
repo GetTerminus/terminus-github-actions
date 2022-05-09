@@ -82,7 +82,7 @@ runs:
     - name: Update Terraform State File - If dry_run == 'false'
       if: ${{ inputs.dry_run == 'false' }}
       run: |
-        terraform import -var-file=vars/${{ inputs.tf_workspace }}.tfvars -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}
+        terraform import -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}
       shell: bash
     - name: Show Terraform State File - Find resource that was imported
       if: ${{ inputs.dry_run == 'false' }}
