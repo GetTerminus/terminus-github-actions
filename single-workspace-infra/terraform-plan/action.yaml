@@ -119,6 +119,7 @@ runs:
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
       with:
         commenter_type: plan
-        commenter_input: tfplan
+        commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        commenter_plan_path: tfplan
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
         terraform_version: ${{ inputs.terraform_version }}
