@@ -149,7 +149,6 @@ runs:
       id: plan
       run: |
         OUTPUT=$(terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=false -input=false -out=tfplan 2>&1)
-        EXIT_CODE=$?
         echo "::set-output name=plan-output::${OUTPUT::65000}"
         echo "::set-output name=exitcode::$?"
       shell: bash
