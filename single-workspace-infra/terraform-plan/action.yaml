@@ -108,7 +108,7 @@ runs:
     - name: TF Plan - Run
       id: plan
       run: |
-        OUTPUT=$(terraform plan -lock=false -input=false -out=tfplan 2>&1)
+        OUTPUT=$(terraform plan -lock=false -input=false -out=tfplan 2>&1 | tee /dev/fd/2; exit ${PIPESTATUS[0]})
         echo "::set-output name=plan-output::${OUTPUT::65000}"
         echo "::set-output name=exitcode::$?"
       shell: bash
