@@ -7,6 +7,9 @@ inputs:
   terraform_version:
     description: '[decimal] [required] (i.e. 1.0.11) Terraform version to use.'
     required: true
+  tf_workspace:
+    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if tf_create_workspace input = true.'
+    required: true
   resource_id:
     description: "[resource_id] [required] (i.e. 45188095) ID of the TF Resource being imported."
     required: true
@@ -25,6 +28,7 @@ runs:
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
         TERRAFORM_VERSION: ${{ inputs.terraform_version }}
+        TF_WORKSPACE: ${{ inputs.tf_workspace }}
         RESOURCE_ID: ${{ inputs.resource_id }}
         RESOURCE_NAME: ${{ inputs.resource_name }}
         DRY_RUN: ${{ inputs.dry_run }}
@@ -55,6 +59,8 @@ runs:
       run: |
         terraform version
         terraform init -lock=false -input=false
+        terraform workspace select ${{ inputs.tf_workspace }}
+        terraform workspace show
       shell: bash
     - name: Dry Run
       if: ${{ inputs.dry_run == 'true' }}
@@ -77,7 +83,11 @@ runs:
     - name: Update Terraform State File - If dry_run == 'false'
       if: ${{ inputs.dry_run == 'false' }}
       run: |
-        terraform import -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}
+        if [ ${{ inputs.tf_workspace }} != "default" ]; then
+          terraform import -var-file=vars/${{ inputs.tf_workspace }}.tfvars -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}
+        else
+          terraform import -var-file=vars/${{ inputs.tf_workspace }}.tfvars -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}
+        fi
       shell: bash
     - name: Show Terraform State File - Find resource that was imported
       if: ${{ inputs.dry_run == 'false' }}
