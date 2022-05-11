@@ -149,6 +149,7 @@ runs:
       id: plan
       run: |
         OUTPUT=$(terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=false -input=false -out=tfplan 2>&1 | tee /dev/fd/2; exit ${PIPESTATUS[0]})
+        echo "Output length: ${#OUTPUT}"
         echo "::set-output name=plan-output::${OUTPUT::65000}"
         echo "::set-output name=exitcode::$?"
       shell: bash
