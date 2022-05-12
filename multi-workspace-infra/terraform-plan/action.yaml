@@ -151,12 +151,21 @@ runs:
       # we want to capture the error instead.
       shell: '/bin/bash {0}'
       run: |
+        # a lot going on here.  copy the stdout file handle to fd5.
         exec 5>&1
+
+        # merge stderr into stdout and print it to fd5 (parent shell's stdout); exit with the code from terraform plan
         OUTPUT=$(terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=false -input=false -out=tfplan 2>&1 | tee /dev/fd/5; exit ${PIPESTATUS[0]})
+
+        # store the exit code here
         EXITCODE=$?
+
+        # github actions doesn't allow us to set a multiline output so we cat it to the environment
         echo "PLAN_OUTPUT<<EOF" >> $GITHUB_ENV
         echo "${OUTPUT::65000}" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
+
+        # set exit code for pickup later, and make sure we exit with same code
         echo "::set-output name=exit::${EXITCODE}"
         exit $EXITCODE
     - name: Post TF Plan Comment
