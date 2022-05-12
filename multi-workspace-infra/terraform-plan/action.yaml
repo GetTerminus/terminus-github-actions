@@ -154,10 +154,10 @@ runs:
         exec 5>&1
         OUTPUT=$(terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=false -input=false -out=tfplan 2>&1 | tee /dev/fd/5; exit ${PIPESTATUS[0]})
         EXITCODE=$?
-        echo "******** OUTPUT IS: $OUTPUT"
-        echo "*************************************************************************************************"
+        echo "PLAN_OUTPUT<<EOF" >> $GITHUB_ENV
+        echo "${OUTPUT::65000}"
+        echo "EOF" >> $GITHUB_ENV
         echo "::set-output name=exit::${EXITCODE}"
-        echo "::set-output name=plan-output::${OUTPUT::65000}"
         exit $EXITCODE
     - name: Post TF Plan Comment
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable_plan_commenter == 'true' }}
@@ -168,7 +168,7 @@ runs:
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
       with:
         commenter_type: plan
-        commenter_input: ${{ steps.plan.outputs.plan-output }}
+        commenter_input: ${{ env.PLAN_OUTPUT }}
         commenter_plan_path: tfplan
         commenter_exitcode: ${{ steps.plan.outputs.exit }}
         terraform_version: ${{ inputs.terraform_version }}
