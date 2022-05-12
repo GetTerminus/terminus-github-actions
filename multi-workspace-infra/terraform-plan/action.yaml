@@ -155,7 +155,7 @@ runs:
         OUTPUT=$(terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=false -input=false -out=tfplan 2>&1 | tee /dev/fd/5; exit ${PIPESTATUS[0]})
         EXITCODE=$?
         echo "PLAN_OUTPUT<<EOF" >> $GITHUB_ENV
-        echo "${OUTPUT::65000}"
+        echo "${OUTPUT::65000}" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
         echo "::set-output name=exit::${EXITCODE}"
         exit $EXITCODE
