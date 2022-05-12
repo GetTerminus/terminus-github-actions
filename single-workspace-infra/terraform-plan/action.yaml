@@ -137,7 +137,7 @@ runs:
         TF_WORKSPACE: ${{ inputs.tf_workspace }}
       with:
         commenter_type: plan
-        commenter_input: ${{ steps.plan.outputs.plan-output }}
+        commenter_input: ${{ env.PLAN_OUTPUT }}
         commenter_plan_path: tfplan
-        commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+        commenter_exitcode: ${{ steps.plan.outputs.exit }}
         terraform_version: ${{ inputs.terraform_version }}
