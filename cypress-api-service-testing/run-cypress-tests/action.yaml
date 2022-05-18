@@ -60,6 +60,10 @@ runs:
         cd ${{ inputs.repo_cypress_dir }}
         echo "CYDIR=$(pwd)" >> $GITHUB_ENV
 
+    - name: Echo GITHUB_REPOSITORY
+      shell: bash
+      run: echo "---------->$GITHUB_REPOSITORY<----------""
+
     - name: Run Tests
       uses: cypress-io/github-action@v2
       with:
