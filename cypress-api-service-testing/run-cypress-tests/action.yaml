@@ -85,4 +85,4 @@ runs:
         DD_ENV: ${{ inputs.environment }}
         DD_SERVICE: ${{ inputs.repo }}
         DEBUG: '@cypress/github-action'
-        GITHUB_REPOSITORY: 'GetTerminus/oauth_service_infra'
+        GITHUB_REPOSITORY: '${{ inputs.repo_owner }}/${{ inputs.repo }}'
