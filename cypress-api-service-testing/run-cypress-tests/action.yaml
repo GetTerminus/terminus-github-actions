@@ -46,7 +46,8 @@ runs:
 
     - name: Yarn Install
       run: |
-        cd ${{ inputs.repo_cypress_dir }}
+        ls -lah
+        cd "${{ inputs.repo }}/${{ ${{ inputs.repo_cypress_dir }}"
         yarn install
       shell: bash
 
@@ -59,16 +60,16 @@ runs:
       with:
         config: video=true
         command-prefix: yarn
-        browser: ${{ github.event.inputs.cypress_browser }}
+        browser: ${{ inputs.cypress_browser }}
         headless: true
-        tag: 'API-${{ github.event.inputs.cypress_browser }},${{ github.event.inputs.environment }}'
+        tag: 'API-${{ inputs.cypress_browser }},${{ inputs.environment }}'
         record: true
         parallel: true
-        working-directory: ${{ github.events.inputs.repo_cypress_dir }}
+        working-directory: "${{ inputs.repo }}/${{ ${{ inputs.repo_cypress_dir }}"
         ci-build-id: ${{ env.SHAGUID }}
       env:
-        CYPRESS_RECORD_KEY: ${{ github.event.inputs.cypress_record_key}}
+        CYPRESS_RECORD_KEY: ${{ inputs.cypress_record_key}}
         YARN_NODE_LINKER: pnp
-        CYPRESS_grepTags: ${{ github.event.inputs.test_tags }}
-        DD_ENV: ${{ github.event.inputs.environment }}
+        CYPRESS_grepTags: ${{ test_tags }}
+        DD_ENV: ${{ inputs.environment }}
         DD_SERVICE: ${{ inputs.repo }}
