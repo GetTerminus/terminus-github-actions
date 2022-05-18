@@ -45,10 +45,14 @@ runs:
         token: ${{ inputs.repo_checkout_token }}
 
     - name: Yarn Install
-      uses: shell
       run: |
         cd ${{ inputs.repo_cypress_dir }}
         yarn install
+      shell: bash
+
+    - name: Generate unique ID
+      shell: bash
+      run: echo "::set-env name=SHAGUID::sha-$GITHUB_SHA-time-$(date +"%s")"
 
     - name: Run Tests
       uses: cypress-io/github-action@v2
@@ -61,7 +65,7 @@ runs:
         record: true
         parallel: true
         working-directory: ${{ github.events.inputs.repo_cypress_dir }}
-        ci-build-id: ${{ needs.prepare.outputs.uuid }}
+        ci-build-id: ${{ env.SHAGUID }}
       env:
         CYPRESS_RECORD_KEY: ${{ github.event.inputs.cypress_record_key}}
         YARN_NODE_LINKER: pnp
