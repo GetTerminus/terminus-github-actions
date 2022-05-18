@@ -62,7 +62,7 @@ runs:
 
     - name: Echo GITHUB_REPOSITORY
       shell: bash
-      run: echo "---------->${{ env.GITHUB_REPOSITORY }}<----------"
+      run: echo "---------->${GITHUB_REPOSITORY}<----------"
 
     - name: Run Tests
       uses: cypress-io/github-action@v2
