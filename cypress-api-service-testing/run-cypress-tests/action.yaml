@@ -47,7 +47,7 @@ runs:
     - name: Yarn Install
       run: |
         ls -lah
-        cd "${{ inputs.repo }}/${{ ${{ inputs.repo_cypress_dir }}"
+        cd "${{ inputs.repo }}/${{ inputs.repo_cypress_dir }}"
         yarn install
       shell: bash
 
@@ -65,11 +65,11 @@ runs:
         tag: 'API-${{ inputs.cypress_browser }},${{ inputs.environment }}'
         record: true
         parallel: true
-        working-directory: "${{ inputs.repo }}/${{ ${{ inputs.repo_cypress_dir }}"
+        working-directory: "${{ inputs.repo }}/${{ inputs.repo_cypress_dir }}"
         ci-build-id: ${{ env.SHAGUID }}
       env:
         CYPRESS_RECORD_KEY: ${{ inputs.cypress_record_key}}
         YARN_NODE_LINKER: pnp
-        CYPRESS_grepTags: ${{ test_tags }}
+        CYPRESS_grepTags: ${{ inputs.test_tags }}
         DD_ENV: ${{ inputs.environment }}
         DD_SERVICE: ${{ inputs.repo }}
