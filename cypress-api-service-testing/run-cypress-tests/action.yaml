@@ -67,7 +67,7 @@ runs:
         echo "---------->${GITHUB_REPOSITORY}<----------"
 
     - name: Run Tests
-      uses: jdborneman-terminus/cypress-io-github-action@c6a138e
+      uses: jdborneman-terminus/cypress-io-github-action@c6a138e9c9753ab20e69d0569cfcb489518da64a
       with:
         config: video=true
         command-prefix: yarn
