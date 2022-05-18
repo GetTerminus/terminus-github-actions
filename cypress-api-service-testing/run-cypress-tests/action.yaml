@@ -1,5 +1,5 @@
 name: 'Run Cypress Tests Vs API Service'
-description: 'Runs Terminus API Service Cypress Tests'
+description: 'Runs Terminus API Service Cypress Tests : Include env block for any environment variables needed, ex: CYPRESS_BASE_URL, CYPRESS_ts_user_email, etc'
 inputs:
   environment:
     description: 'The environment against which to run tests (ex: ninja)'
@@ -26,16 +26,13 @@ inputs:
     description: 'The browsers to test against'
     required: false
     default: 'chrome'
-  # example environment_vars:
-  # At MINIMUM CYPRESS_RECORD_KEY is required
-  # '[{"var":"CYPRESS_RECORD_KEY=''xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx''"},{"var":"CYPRESS_ts_user_email=''email@something.com''"}]'
-  environment_vars:
-    description: 'Stringified JSON array payload of environment variables to set'
-    required: true
   test_tags:
     description: 'Cypress tags to run'
     required: false
     default: '@SMOKE'
+  cypress_record_key:
+    description: 'The Cypress Dashboard Record Key'
+    required: true
 
 runs:
   using: "composite"
@@ -81,6 +78,7 @@ runs:
         working-directory: ${{ github.events.inputs.repo_cypress_dir }}
         ci-build-id: ${{ needs.prepare.outputs.uuid }}
       env:
+        CYPRESS_RECORD_KEY: ${{ github.event.inputs.cypress_record_key}}
         YARN_NODE_LINKER: pnp
         CYPRESS_grepTags: ${{ github.event.inputs.test_tags }}
         DD_ENV: ${{ github.event.inputs.environment }}
