@@ -20,22 +20,6 @@ inputs:
   artifactory_helm_chart_path:
     description: '[string] Path to helm chart for artifactory.'
     required: false
-  cypress_test_branch:
-    description: "Branch for Cypress Integration Test"
-    required: false
-  cypress_test_workflow:
-    description: "Workflow name for Cypress Integration Test"
-    required: false
-  cypress_test_repo:
-    description: "Repo name for Cypress Integration Test"
-    required: false
-  cypress_test_token:
-    description: "Token for access to Cypress Integration Test"
-    required: false
-  cypress_test_env:
-    description: "Environment to run in for Cypress Integration Test"
-    default: ninja
-    required: false
   datadog_api_key:
     description: '[secret] DataDog API Key. Required for the git-metadata upload.'
     required: false
@@ -147,15 +131,6 @@ runs:
         api_key: ${{ env.DATADOG_API_KEY }}
         app_key: ${{ env.DATADOG_APP_KEY }}
         test_search_query: 'tag:managedby:*${{ env.GITHUB_REPOSITORY }}*'
-    - name: Run Post Deploy Integration Cypress Tests
-      if: ${{ inputs.cypress_test_branch != '' && inputs.cypress_test_workflow != '' && inputs.cypress_test_repo != '' && inputs.cypress_test_token != '' && inputs.cypress_test_env != '' }}
-      uses: benc-uk/workflow-dispatch@v1
-      with:
-        ref: refs/heads/${{ inputs.cypress_test_branch }}
-        workflow: ${{ inputs.cypress_test_workflow }}
-        repo: GetTerminus/${{ inputs.cypress_test_repo }}
-        token: ${{ inputs.cypress_test_token }}
-        inputs: '{ "environment": "${{ inputs.cypress_test_env }}" }'
     - name: Deployment Success
       if: ${{ success() && inputs.use_delivery_bot == 'true' }}
       uses: deliverybot/deployment-status@v1
