@@ -52,7 +52,7 @@ runs:
 
     - name: Generate unique ID
       shell: bash
-      run: echo "::set-env name=SHAGUID::sha-$GITHUB_SHA-time-$(date +"%s")"
+      run: echo "SHAGUID=sha-$GITHUB_SHA-time-$(date +"%s")" >> $GITHUB_ENV
 
     - name: Run Tests
       uses: cypress-io/github-action@v2
