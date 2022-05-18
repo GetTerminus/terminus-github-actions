@@ -60,14 +60,8 @@ runs:
         cd ${{ inputs.repo_cypress_dir }}
         echo "CYDIR=$(pwd)" >> $GITHUB_ENV
 
-    - name: Echo GITHUB_REPOSITORY
-      shell: bash
-      run: |
-        cd ${{ inputs.repo_cypress_dir }}
-        echo "---------->${GITHUB_REPOSITORY}<----------"
-
     - name: Run Tests
-      uses: jdborneman-terminus/cypress-io-github-action@00b530b3de035e8724c5ed3e35f1ee445e8916e5
+      uses: jdborneman-terminus/cypress-io-github-action@4b8d0b2d90aa41cd05cdfce5386e6e382c49a2e2
       with:
         config: video=true
         command-prefix: yarn
