@@ -53,6 +53,12 @@ runs:
     - name: Generate unique ID
       shell: bash
       run: echo "SHAGUID=sha-$GITHUB_SHA-time-$(date +"%s")" >> $GITHUB_ENV
+    
+    - name: Get working directory for tests
+      shell: bash
+      run: |
+        cd ${{ inputs.repo_cypress_dir }}
+        echo "CYDIR=$(pwd)" >> $GITHUB_ENV
 
     - name: Run Tests
       uses: cypress-io/github-action@v2
@@ -64,7 +70,7 @@ runs:
         tag: 'API-${{ inputs.cypress_browser }},${{ inputs.environment }}'
         record: true
         parallel: true
-        working-directory: ${{ inputs.repo_cypress_dir }}
+        working-directory: ${{ env.CYDIR }}
         ci-build-id: ${{ env.SHAGUID }}
       env:
         CYPRESS_RECORD_KEY: ${{ inputs.cypress_record_key}}
