@@ -50,21 +50,6 @@ runs:
         cd ${{ inputs.repo_cypress_dir }}
         yarn install
 
-    - name: Parse Env vars
-      uses: sergeysova/jq-action@v2
-      id: environment_vars
-      with:
-        cmd: 'jq ''.[] | .var'' ${{ environment_vars }} -r'
-        multline: true
-    
-    - name: Set Env vars
-      uses: shell
-      run: |
-        environment_vars="${{ steps.environment_vars.outputs.value }}"
-        for environment_var in $environment_vars; do
-          export "$environment_var"
-        done
-
     - name: Run Tests
       uses: cypress-io/github-action@v2
       with:
