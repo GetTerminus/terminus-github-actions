@@ -8,7 +8,7 @@ inputs:
     description: '[decimal] [required] (i.e. 1.0.11) Terraform version to use.'
     required: true
   tf_workspace:
-    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if tf_create_workspace input = true.'
+    description: '[string] (i.e. ninja/prod-east) TF Workspace to import into.'
     required: true
   resource_id:
     description: "[resource_id] [required] (i.e. 45188095) ID of the TF Resource being imported."
@@ -68,10 +68,11 @@ runs:
         RED='\033[0;31m'
         NC='\033[0m'
         printf "${RED}Below are the list of commands that will run:${NC}\n"
-        printf "%s" "terraform version"
-        printf "%s" "terraform init -lock=false -input=false"
-        printf "%s" "terraform import -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}"
-        printf "%s" "terraform show"
+        printf "\n%s" "terraform version"
+        printf "\n%s" "terraform init -lock=false -input=false"
+        printf "\n%s" "terraform workspace select ${{ inputs.tf_workspace }}"
+        printf "\n%s" "terraform import -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}"
+        printf "\n%s" "terraform show"
         printf "\n\n${RED}Please make sure to do the following when doing the actual import:${NC}"
         printf "\n${RED}1.${NC} Before running the import make sure you enter an empty resource in a .tf file in your root (resource \"github_repository\" \"this-is-an-example\" {})."
         printf "\n${RED}2.${NC} After the import runs successfully, search for your resource in the ${RED}Console Output${NC} and copy all of the attributes."
@@ -86,7 +87,7 @@ runs:
         if [ ${{ inputs.tf_workspace }} != "default" ]; then
           terraform import -var-file=vars/${{ inputs.tf_workspace }}.tfvars -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}
         else
-          terraform import -var-file=vars/${{ inputs.tf_workspace }}.tfvars -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}
+          terraform import -input=false ${{ inputs.resource_name }} ${{ inputs.resource_id }}
         fi
       shell: bash
     - name: Show Terraform State File - Find resource that was imported
