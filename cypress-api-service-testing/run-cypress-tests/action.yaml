@@ -26,7 +26,7 @@ inputs:
     description: 'The browser to test against'
     required: false
     default: 'chrome'
-  test_tags:
+  cypress_test_tags:
     description: 'Cypress tags to run'
     required: false
     default: '@SMOKE'
@@ -74,7 +74,7 @@ runs:
       env:
         CYPRESS_RECORD_KEY: ${{ inputs.cypress_record_key}}
         YARN_NODE_LINKER: pnp
-        CYPRESS_grepTags: ${{ inputs.test_tags }}
+        CYPRESS_grepTags: ${{ inputs.cypress_test_tags }}
         DD_ENV: ${{ inputs.environment }}
         DD_SERVICE: ${{ inputs.repo }}
         DEBUG: '@cypress/github-action'
