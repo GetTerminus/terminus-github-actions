@@ -61,7 +61,7 @@ runs:
         echo "CYDIR=$(pwd)" >> $GITHUB_ENV
 
     - name: Run Tests
-      uses: jdborneman-terminus/cypress-io-github-action@6b4776ce07d9ded26846e8ffb9680ef0034556e5
+      uses: cypress-io/github-action@e1028255ee17f0c0f405ef8867675a165a086971
       with:
         config: video=true
         command-prefix: yarn
