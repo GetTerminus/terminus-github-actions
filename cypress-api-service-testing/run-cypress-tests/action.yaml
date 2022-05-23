@@ -23,7 +23,7 @@ inputs:
     required: false
     default: 'cypress-e2e'
   cypress_browser:
-    description: 'The browsers to test against'
+    description: 'The browser to test against'
     required: false
     default: 'chrome'
   test_tags:
@@ -49,10 +49,6 @@ runs:
         cd ${{ inputs.repo_cypress_dir }}
         yarn install
       shell: bash
-
-    - name: Generate unique ID
-      shell: bash
-      run: echo "SHAGUID=sha-$GITHUB_SHA-time-$(date +"%s")" >> $GITHUB_ENV
     
     - name: Get working directory for tests
       shell: bash
@@ -71,7 +67,7 @@ runs:
         record: true
         parallel: true
         working-directory: ${{ env.CYDIR }}
-        ci-build-id: ${{ env.SHAGUID }}
+        ci-build-id: ${{ github.run_id }}
       env:
         CYPRESS_RECORD_KEY: ${{ inputs.cypress_record_key}}
         YARN_NODE_LINKER: pnp
