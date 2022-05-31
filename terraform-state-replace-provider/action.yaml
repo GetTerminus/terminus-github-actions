@@ -1,4 +1,4 @@
-name: 'Terraform Import'
+name: 'Terraform Replace Provider'
 description: 'Runs terraform state replace-provider using old and new provider locations.'
 inputs:
   ssh_key:
