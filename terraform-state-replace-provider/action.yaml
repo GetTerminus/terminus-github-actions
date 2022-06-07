@@ -7,6 +7,9 @@ inputs:
   terraform_version:
     description: '[decimal] [required] (e.g. 1.0.11) Terraform version to use.'
     required: true
+  tf_workspace:
+    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if tf_create_workspace input = true.'
+    required: true
   old_provider:
     description: "[old_provider] [required] (e.g. hashicorp/github) Name of the provider to replace."
     required: true
