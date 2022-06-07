@@ -24,6 +24,7 @@ runs:
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
         TERRAFORM_VERSION: ${{ inputs.terraform_version }}
+        TF_WORKSPACE: ${{ inputs.tf_workspace }}
         OLD_PROVIDER: ${{ inputs.old_provider }}
         NEW_PROVIDER: ${{ inputs.new_provider }}
       run: |
@@ -52,6 +53,8 @@ runs:
       run: |
         terraform version
         terraform init -lock=false -input=false
+        terraform workspace select ${{ inputs.tf_workspace }}
+        terraform workspace show
       shell: bash
     - name: List Terraform providers (pre-replace)
       run: |
