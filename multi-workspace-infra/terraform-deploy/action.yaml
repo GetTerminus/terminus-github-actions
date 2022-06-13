@@ -6,7 +6,7 @@ inputs:
     required: true
   environment:
     description: 'target deployment environment'
-    default: ninja
+    default: all
     required: false
 runs:
   using: "composite"
