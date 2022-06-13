@@ -39,4 +39,4 @@ runs:
         -H "Authorization: token ${{ inputs.gh_deployment_access_token }}" \
         https://api.github.com/repos/GetTerminus/eks-infra/deployments \
         -d '{"ref":"master","environment":"all",payload":"{ \"deploy\": \"migrate\" }","description":"Deploy request from hubot"}'
-      shell: curl
+      shell: bash
