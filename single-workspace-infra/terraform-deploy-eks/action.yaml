@@ -23,11 +23,20 @@ runs:
 
         validateInput inputs
       shell: bash
-    - name: Create Sequential Deployments
-      uses: chrnorm/deployment-action@releases/v2
-      with:
-        token: ${{ inputs.gh_deployment_access_token }}
-        environment: ${{ inputs.environment }}
-        owner: GetTerminus
-        repo: eks-infra
-        ref: master
+#    - name: Create Sequential Deployments
+#      uses: chrnorm/deployment-action@releases/v2
+#      with:
+#        token: ${{ inputs.gh_deployment_access_token }}
+#        environment: ${{ inputs.environment }}
+#        owner: GetTerminus
+#        repo: eks-infra
+#        ref: master
+    - name: Create EKS Deployment
+      run: |
+        curl \
+        -X POST \
+        -H "Accept: application/vnd.github.v3+json" \
+        -H "Authorization: token ${{ inputs.gh_deployment_access_token }}" \
+        https://api.github.com/repos/GetTerminus/eks-infra/deployments \
+        -d '{"ref":"master","environment":"all",payload":"{ \"deploy\": \"migrate\" }","description":"Deploy request from hubot"}'
+      shell: curl
