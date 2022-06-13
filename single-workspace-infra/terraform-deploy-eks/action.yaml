@@ -28,4 +28,5 @@ runs:
       with:
         token: ${{ inputs.gh_deployment_access_token }}
         environment: ${{ inputs.environment }}
+        owner: GetTerminus
         repo: eks-infra
