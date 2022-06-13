@@ -28,4 +28,4 @@ runs:
       with:
         token: ${{ inputs.gh_deployment_access_token }}
         environment: ${{ inputs.environment }}
-        repo: 'GetTerminus/eks-infra'
+        repo: https://github.com/GetTerminus/eks-infra
