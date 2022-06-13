@@ -30,3 +30,4 @@ runs:
         environment: ${{ inputs.environment }}
         owner: GetTerminus
         repo: eks-infra
+        ref: master
