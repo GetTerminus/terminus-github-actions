@@ -1,30 +1,31 @@
 name: 'Terraform Deploy EKS - Single Workspace'
 description: 'Triggers a workflow dispatch of EKS Infra - Terraform Apply.'
 inputs:
-  pull_access_token:
-    description: '[secret] Github pull access token.'
+  gh_deployment_access_token:
+    description: '[secret] GitHub deployment access token.'
     required: true
+  environment:
+    description: 'target deployment environment'
+    default: ninja
+    required: false
 runs:
   using: "composite"
   steps:
     - name: Validate Inputs
       env:
-        PULL_ACCESS_TOKEN: ${{ inputs.pull_access_token }}
+        GH_DEPLOYMENT_ACCESS_TOKEN: ${{ inputs.gh_deployment_access_token }}
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
-        
+
         declare -A inputs
-        inputs[pull_access_token]="$PULL_ACCESS_TOKEN"
-        
+        inputs[gh_deployment_access_token]="$GH_DEPLOYMENT_ACCESS_TOKEN"
+
         validateInput inputs
       shell: bash
     - name: Deploy EKS Infra
-      uses: benc-uk/workflow-dispatch@v1
+      uses: chrnorm/deployment-action@releases/v1
       with:
-        workflow: Terraform Apply
-        token: ${{ inputs.pull_access_token }}
-        repo: GetTerminus/eks-infra
-        ref: master
-        inputs: '{"environment": "all", "use_delivery_bot": "false"}'
-      
+        token: ${{ inputs.gh_deployment_access_token }}
+        environment: ${{ inputs.environment }}
+        repo: 'eks-infra'

@@ -6,7 +6,7 @@ inputs:
     required: true
   environment:
     description: 'target deployment environment'
-    default: all
+    default: ninja
     required: false
 runs:
   using: "composite"
@@ -17,10 +17,10 @@ runs:
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
-        
+
         declare -A inputs
         inputs[gh_deployment_access_token]="$GH_DEPLOYMENT_ACCESS_TOKEN"
-        
+
         validateInput inputs
       shell: bash
     - name: Create Sequential Deployments
@@ -28,4 +28,3 @@ runs:
       with:
         token: ${{ inputs.gh_deployment_access_token }}
         environment: ${{ inputs.environment }}
-        use_delivery_bot: true
