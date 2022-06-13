@@ -20,22 +20,6 @@ inputs:
   artifactory_helm_chart_path:
     description: '[string] Path to helm chart for artifactory.'
     required: false
-  cypress_test_branch:
-    description: "Branch for Cypress Integration Test"
-    required: false
-  cypress_test_workflow:
-    description: "Workflow name for Cypress Integration Test"
-    required: false
-  cypress_test_repo:
-    description: "Repo name for Cypress Integration Test"
-    required: false
-  cypress_test_token:
-    description: "Token for access to Cypress Integration Test"
-    required: false
-  cypress_test_env:
-    description: "Environment to run in for Cypress Integration Test"
-    default: ninja
-    required: false
   datadog_api_key:
     description: '[secret] DataDog API Key. Required for the git-metadata upload.'
     required: false
