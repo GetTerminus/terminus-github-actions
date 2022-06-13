@@ -4,10 +4,6 @@ inputs:
   gh_deployment_access_token:
     description: '[secret] GitHub deployment access token.'
     required: true
-  environment:
-    description: 'target deployment environment'
-    default: all
-    required: false
 runs:
   using: "composite"
   steps:
@@ -23,14 +19,6 @@ runs:
 
         validateInput inputs
       shell: bash
-#    - name: Create Sequential Deployments
-#      uses: chrnorm/deployment-action@releases/v2
-#      with:
-#        token: ${{ inputs.gh_deployment_access_token }}
-#        environment: ${{ inputs.environment }}
-#        owner: GetTerminus
-#        repo: eks-infra
-#        ref: master
     - name: Create EKS Deployment
       run: |
         curl \
