@@ -13,13 +13,13 @@ runs:
   steps:
     - name: Validate Inputs
       env:
-        PULL_ACCESS_TOKEN: ${{ inputs.pull_access_token }}
+        GH_DEPLOYMENT_ACCESS_TOKEN: ${{ inputs.gh_deployment_access_token }}
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
 
         declare -A inputs
-        inputs[pull_access_token]="$PULL_ACCESS_TOKEN"
+        inputs[gh_deployment_access_token]="$GH_DEPLOYMENT_ACCESS_TOKEN"
 
         validateInput inputs
       shell: bash
