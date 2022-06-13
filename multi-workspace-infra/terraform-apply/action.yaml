@@ -70,7 +70,8 @@ runs:
       if: always()
       uses: chrnorm/deployment-status@v2
       with:
-        state: 'pending'
+        token: ${{ github.token }}
+        state: pending
         deployment-id: ${{ github.event.deployment.id }}
     - name: Helm Update
       if: ${{ inputs.artifactory_enabled == 'true' }}
@@ -141,11 +142,13 @@ runs:
       if: success()
       uses: chrnorm/deployment-status@v2
       with:
-        state: 'success'
+        token: ${{ github.token }}
+        state: success
         deployment-id: ${{ github.event.deployment.id }}
     - name: Update deployment status (failure)
       if: failure()
       uses: chrnorm/deployment-status@v2
       with:
-        state: 'failure'
+        token: ${{ github.token }}
+        state: failure
         deployment-id: ${{ github.event.deployment.id }}
