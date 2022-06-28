@@ -7,8 +7,8 @@ inputs:
   terraform_version:
     description: '[decimal] (i.e. 1.0.11) Terraform version to use.'
     required: true
-  tf_workspace:
-    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if tf_create_workspace input = true.'
+  terraform_workspace:
+    description: '[string] (i.e. ninja/prod-east) TF Workspace.'
     required: true
   artifactory_enabled:
     description: '[bool] (i.e. true/false) Whether or not the repo uses artifactory for the helm chart.'
@@ -35,7 +35,7 @@ runs:
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
         TERRAFORM_VERSION: ${{ inputs.terraform_version }}
-        TF_WORKSPACE: ${{ inputs.tf_workspace }}
+        TERRAFORM_WORKSPACE: ${{ inputs.terraform_workspace }}
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
@@ -43,7 +43,7 @@ runs:
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
         inputs[terraform_version]="$TERRAFORM_VERSION"
-        inputs[tf_workspace]="$TF_WORKSPACE"
+        inputs[terraform_workspace]="TERRAFORM_WORKSPACE"
 
         validateInput inputs
       shell: bash
@@ -94,9 +94,9 @@ runs:
         terraform version
         terraform init -lock=false -input=false
         terraform validate
-        terraform workspace select ${{ inputs.tf_workspace }}
+        terraform workspace select ${{ inputs.terraform_workspace }}
         terraform workspace show
-        terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=true -lock-timeout=0s -input=false -out=tfplan
+        terraform plan -var-file=vars/${{ inputs.terraform_workspace }}.tfvars -lock=true -lock-timeout=0s -input=false -out=tfplan
         terraform apply -lock=true -lock-timeout=0s -input=false tfplan
       shell: bash
     - name: Set Github Repo to Env Variable

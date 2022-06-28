@@ -7,8 +7,8 @@ inputs:
   terraform_version:
     description: '[decimal] (i.e. 1.0.11) Terraform version to use.'
     required: true
-  tf_workspace:
-    description: '[string] (i.e. ninja/prod-east) TF Workspace to create if tf_create_workspace input = true.'
+  terraform_workspace:
+    description: '[string] (i.e. ninja/prod-east) TF Workspace.'
     required: true
   github_token:
     description: '[secret] Github token for plan commenter to use.'
@@ -29,7 +29,7 @@ inputs:
     default: 'true'
   tf_create_workspace:
     description: '[bool] (i.e. true/false) If set to true, workspace will be
-                  created based on tf_workspace input variable. This should only be run when
+                  created based on terraform_workspace input variable. This should only be run when
                   creating the repo and running the plan for the first time and
                   removed after.'
     required: false
@@ -46,7 +46,7 @@ runs:
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
         TERRAFORM_VERSION: ${{ inputs.terraform_version }}
-        TF_WORKSPACE: ${{ inputs.tf_workspace }}
+        TERRAFORM_WORKSPACE: ${{ inputs.terraform_workspace }}
         GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
         cd ${{ github.action_path }}
@@ -55,7 +55,7 @@ runs:
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
         inputs[terraform_version]="$TERRAFORM_VERSION"
-        inputs[tf_workspace]="$TF_WORKSPACE"
+        inputs[terraform_workspace]="TERRAFORM_WORKSPACE"
         inputs[github_token]="$GITHUB_TOKEN"
 
         validateInput inputs
@@ -120,13 +120,13 @@ runs:
     - name: TF Plan - Select Workspace
       if: ${{ inputs.tf_create_workspace != 'true' }}
       run: |
-        terraform workspace select ${{ inputs.tf_workspace }}
+        terraform workspace select ${{ inputs.terraform_workspace }}
       shell: bash
     - name: TF Plan - Create Workspace
       if: ${{ inputs.tf_create_workspace == 'true' }}
       run: |
-        terraform workspace new ${{ inputs.tf_workspace }}
-        terraform workspace select ${{ inputs.tf_workspace }}
+        terraform workspace new ${{ inputs.terraform_workspace }}
+        terraform workspace select ${{ inputs.terraform_workspace }}
       shell: bash
     - name: TF Plan - Validate
       id: validate
@@ -155,7 +155,7 @@ runs:
         exec 5>&1
 
         # merge stderr into stdout and print it to fd5 (parent shell's stdout); exit with the code from terraform plan
-        OUTPUT=$(terraform plan -var-file=vars/${{ inputs.tf_workspace }}.tfvars -lock=false -input=false -out=tfplan 2>&1 | tee /dev/fd/5; exit ${PIPESTATUS[0]})
+        OUTPUT=$(terraform plan -var-file=vars/${{ inputs.terraform_workspace }}.tfvars -lock=false -input=false -out=tfplan 2>&1 | tee /dev/fd/5; exit ${PIPESTATUS[0]})
 
         # store the exit code here
         EXITCODE=$?
@@ -174,7 +174,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         EXPAND_SUMMARY_DETAILS: "false"
-        TF_WORKSPACE: ${{ inputs.tf_workspace }}
+        TF_WORKSPACE: ${{ inputs.terraform_workspace }}
       with:
         commenter_type: plan
         commenter_input: ${{ env.PLAN_OUTPUT }}
