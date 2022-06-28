@@ -7,6 +7,9 @@ inputs:
   terraform_version:
     description: '[decimal] [required] (e.g. 1.0.11) Terraform version to use.'
     required: true
+  terraform_workspace:
+    description: '[string] (i.e. ninja/prod-east) TF Workspace.'
+    required: true
   old_provider:
     description: "[old_provider] [required] (e.g. hashicorp/github) Name of the provider to replace."
     required: true
@@ -21,6 +24,7 @@ runs:
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
         TERRAFORM_VERSION: ${{ inputs.terraform_version }}
+        TERRAFORM_WORKSPACE: ${{ inputs.terraform_workspace }}
         OLD_PROVIDER: ${{ inputs.old_provider }}
         NEW_PROVIDER: ${{ inputs.new_provider }}
       run: |
@@ -29,6 +33,7 @@ runs:
 
         declare -A inputs
         inputs[terraform_version]="$TERRAFORM_VERSION"
+        inputs[terraform_workspace]="TERRAFORM_WORKSPACE"
         inputs[old_provider]="$OLD_PROVIDER"
         inputs[new_provider]="$NEW_PROVIDER"
 
@@ -48,8 +53,7 @@ runs:
       run: |
         terraform version
         terraform init -lock=false -input=false
-        # can't use workspace select because we are setting the TF_WORKSPACE env var instead
-        # terraform workspace select ${{ inputs.tf_workspace }}
+        terraform workspace select ${{ inputs.tf_workspace }}
         terraform workspace show
       shell: bash
     - name: List Terraform providers (pre-replace)
