@@ -53,7 +53,7 @@ runs:
       run: |
         terraform version
         terraform init -lock=false -input=false
-        terraform workspace select ${{ inputs.tf_workspace }}
+        terraform workspace select ${{ inputs.terraform_workspace }}
         terraform workspace show
       shell: bash
     - name: List Terraform providers (pre-replace)
