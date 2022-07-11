@@ -4,7 +4,10 @@ inputs:
   ssh_key:
     description: '[secret] GitHub SSH Key for pulling repo.'
     required: true
-
+outputs:
+  matrix:
+    description: '[obj] Matrix of Build Targets'
+    value: ${{ steps.matrix.outputs.value }}
 runs:
   using: "composite"
   steps:
