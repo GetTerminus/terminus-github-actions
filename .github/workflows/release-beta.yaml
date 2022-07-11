@@ -13,7 +13,7 @@ jobs:
       - name: Set Beta Git tag
         uses: weareyipyip/walking-tag-action@v2
         with:
-          tag-name: v1-beta
-          tag-message: The current beta is based on this commit
+          tag-name: ${{ github.ref_name }}
+          tag-message: The current beta is based on the ${{ github.ref_name }} branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
