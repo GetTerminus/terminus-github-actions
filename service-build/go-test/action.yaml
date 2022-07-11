@@ -59,6 +59,7 @@ runs:
     - uses: bufbuild/buf-setup-action@v1.4.0
       with:
         version: ${{ steps.id_buf_version.outputs.BUF_VERSION }}
+        github_token: ${{ inputs.github_token }}
     - uses: bufbuild/buf-lint-action@v1
     - uses: bufbuild/buf-breaking-action@v0.4.0
       name: Review breaking changes for PR
