@@ -4,6 +4,9 @@ inputs:
   ssh_key:
     description: '[secret] GitHub SSH Key for pulling repo.'
     required: true
+  service_name:
+    description: '[string] Name of the service being tested.'
+    required: true
   github_token:
     description: '[secret] GitHub Token.'
     required: true
@@ -97,5 +100,5 @@ runs:
         DD_ENV: ci
       run: |
         npm install -g @datadog/datadog-ci
-        datadog-ci junit upload --service tray-io-integration-service report.xml
+        datadog-ci junit upload --service ${{ inputs.service_name }} report.xml
       shell: bash
