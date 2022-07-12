@@ -29,14 +29,32 @@ runs:
     - name: Validate Inputs
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
+        SERVICE_NAME: ${{ inputs.service_name }}
+        ECR_PUSHER_ACCESS_KEY_ID: ${{ inputs.ecr_pusher_access_key_id }}
+        ECR_PUSHER_ACCESS_KEY: ${{ inputs.ecr_pusher_access_key }}
+        DOCKERHUB_USERNAME: ${{ inputs.dockerhub_username }}
+        DOCKERHUB_TOKEN: ${{ inputs.dockerhub_token }}
+        TARGET_DIRECTORY: ${{ inputs.target_directory }}
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
 
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
+        inputs[service_name]="$SERVICE_NAME"
+        inputs[ecr_pusher_access_key_id]="$ECR_PUSHER_ACCESS_KEY_ID"
+        inputs[ecr_pusher_access_key]="$ECR_PUSHER_ACCESS_KEY"
+        inputs[dockerhub_username]="$DOCKERHUB_USERNAME"
+        inputs[dockerhub_token]="$DOCKERHUB_TOKEN"
+        inputs[target_directory]="$TARGET_DIRECTORY"
 
         validateInput inputs
+        declare -A envVariables
+        envVariables[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]=$GOLANG_PROTOBUF_REGISTRATION_CONFLICT
+        envVariables[GOPROXY]=$GOPROXY
+        envVariables[GONOSUMDB]=$GONOSUMDB
+
+        validateInput envVariables
       shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1

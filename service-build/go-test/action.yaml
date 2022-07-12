@@ -20,12 +20,18 @@ runs:
     - name: Validate Inputs/Env Variables
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
+        SERVICE_NAME: ${{ inputs.service_name }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        DD_API_KEY: ${{ inputs.dd_api_key }}
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
 
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
+        inputs[service_name]="$SERVICE_NAME"
+        inputs[github_token]="$GITHUB_TOKEN"
+        inputs[dd_api_key]="$DD_API_KEY"
 
         validateInput inputs
 
