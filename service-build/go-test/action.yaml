@@ -27,12 +27,13 @@ runs:
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
 
-#       Check required environment variables
-        inputs[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]="$GOLANG_PROTOBUF_REGISTRATION_CONFLICT"
-        inputs[GOPROXY]="$GOPROXY"
-        inputs[GONOSUMDB]="$GONOSUMDB"
-
         validateInput inputs
+      shell: bash
+    - name: Validate ENV Variables
+      run: |
+        [[ -z "${GOLANG_PROTOBUF_REGISTRATION_CONFLICT}" ]] && echo "GOLANG_PROTOBUF_REGISTRATION_CONFLICT is not set." && exit 1"
+        [[ -z "${GOPROXY}" ]] && echo "GOPROXY is not set." && exit 1"
+        [[ -z "${GONOSUMDB}" ]] && echo "GONOSUMDB is not set." && exit 1"
       shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1

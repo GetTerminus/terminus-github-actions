@@ -36,11 +36,6 @@ runs:
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
 
-#       Check required environment variables
-        inputs[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]="$GOLANG_PROTOBUF_REGISTRATION_CONFLICT"
-        inputs[GOPROXY]="$GOPROXY"
-        inputs[GONOSUMDB]="$GONOSUMDB"
-
         validateInput inputs
       shell: bash
     - name: Install SSH Key

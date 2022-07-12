@@ -36,7 +36,7 @@ function validateInput() {
     done
   if [ "$error_count" -gt 0 ]
   then
-    info "For a list of required inputs, please check the corresponding directory in: https://github.com/GetTerminus/terminus-github-actions. Also double check that you have all required env variables set."
+    info "For a list of required inputs, please check the corresponding directory in: https://github.com/GetTerminus/terminus-github-actions."
     exit 1
   else
     success "Input validation passed!"
