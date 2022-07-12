@@ -35,14 +35,12 @@ runs:
 
         validateInput inputs
       shell: bash
-#    - name: Set Environmental Variables
-#      run: |
-#        echo "GOPRIVATE=github.com/GetTerminus/*" >> $GITHUB_ENV
-#        echo "GOFLAGS=-mod=vendor" >> $GITHUB_ENV
-#        echo "CGO_ENABLED=0" >> $GITHUB_ENV
-#        echo "GOOS=linux" >> $GITHUB_ENV
-#        echo "GOARCH=amd64" >> $GITHUB_ENV
-#      shell: bash
+    - name: Set Environmental Variables
+      run: |
+        echo "GONOSUMDB=github.com/GetTerminus/*" >> $GITHUB_ENV
+        echo "GOLANG_PROTOBUF_REGISTRATION_CONFLICT=ignore" >> $GITHUB_ENV
+        echo "GOPROXY=https://developer:${{ inputs.artifactory_token }}@getterminus.jfrog.io/artifactory/api/go/default-go" >> $GITHUB_ENV
+      shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
       with:
