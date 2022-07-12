@@ -17,7 +17,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Validate Inputs
+    - name: Validate Inputs/Env Variables
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
       run: |
@@ -28,15 +28,13 @@ runs:
         inputs[ssh_key]="$SSH_KEY"
 
         validateInput inputs
-      shell: bash
-    - name: Validate ENV Variables
-      run: |
-        cd ${{ github.action_path }}
-        source ../../shell-scripts/input-validator.sh
 
-        declare -A inputs
+        declare -A envVariables
         inputs[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]=$GOLANG_PROTOBUF_REGISTRATION_CONFLICT
-        validateInput inputs
+        inputs[GOPROXY]=$GOPROXY
+        inputs[GONOSUMDB]=$GONOSUMDB
+
+        validateInput envVariables
       shell: bash
     - name: Validate ENV Variables
       run: |
