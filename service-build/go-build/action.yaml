@@ -16,6 +16,9 @@ inputs:
   dockerhub_token:
     description: '[secret] DockerHub Username.'
     required: true
+  artifactory_token:
+    description: '[secret] Artifactory Token.'
+    required: true
   target_directory:
     description: '[string] Target directory for build commands.'
     required: true

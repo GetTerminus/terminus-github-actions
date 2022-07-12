@@ -4,6 +4,9 @@ inputs:
   ssh_key:
     description: '[secret] GitHub SSH Key for pulling repo.'
     required: true
+  artifactory_token:
+    description: '[secret] Artifactory Token.'
+    required: true
 outputs:
   matrix:
     description: '[obj] Matrix of Build Targets'
