@@ -7,9 +7,6 @@ inputs:
   github_token:
     description: '[secret] GitHub Token.'
     required: true
-  artifactory_token:
-    description: '[secret] Artifactory Token.'
-    required: true
   dd_api_key:
     description: '[secret] DataDog API Key.'
     required: true
@@ -27,18 +24,17 @@ runs:
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
 
+#       Check required environment variables
+        inputs[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]="$GOLANG_PROTOBUF_REGISTRATION_CONFLICT"
+        inputs[GOPROXY]="$GOPROXY"
+        inputs[GONOSUMDB]="$GONOSUMDB"
+
         validateInput inputs
       shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
       with:
         ssh-private-key: ${{ inputs.ssh_key }}
-    - name: Set Environmental Variables
-      run: |
-        echo "GONOSUMDB=github.com/GetTerminus/*" >> $GITHUB_ENV
-        echo "GOLANG_PROTOBUF_REGISTRATION_CONFLICT=ignore" >> $GITHUB_ENV
-        echo "GOPROXY=https://developer:${{ inputs.artifactory_token }}@getterminus.jfrog.io/artifactory/api/go/default-go" >> $GITHUB_ENV
-      shell: bash
     - name: Checkout code
       uses: actions/checkout@v3
     - id: id_version

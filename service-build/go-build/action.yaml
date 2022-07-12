@@ -16,9 +16,6 @@ inputs:
   dockerhub_token:
     description: '[secret] DockerHub Username.'
     required: true
-  artifactory_token:
-    description: '[secret] Artifactory Token.'
-    required: true
   target_directory:
     description: '[string] Target directory for build commands.'
     required: true
@@ -36,13 +33,12 @@ runs:
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
 
+#       Check required environment variables
+        inputs[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]="$GOLANG_PROTOBUF_REGISTRATION_CONFLICT"
+        inputs[GOPROXY]="$GOPROXY"
+        inputs[GONOSUMDB]="$GONOSUMDB"
+
         validateInput inputs
-      shell: bash
-    - name: Set Environmental Variables
-      run: |
-        echo "GONOSUMDB=github.com/GetTerminus/*" >> $GITHUB_ENV
-        echo "GOLANG_PROTOBUF_REGISTRATION_CONFLICT=ignore" >> $GITHUB_ENV
-        echo "GOPROXY=https://developer:${{ inputs.artifactory_token }}@getterminus.jfrog.io/artifactory/api/go/default-go" >> $GITHUB_ENV
       shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
