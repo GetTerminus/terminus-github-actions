@@ -35,7 +35,7 @@ runs:
         source ../../shell-scripts/input-validator.sh
 
         declare -A inputs
-        inputs[$GOLANG_PROTOBUF_REGISTRATION_CONFLICT]
+        inputs[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]=$GOLANG_PROTOBUF_REGISTRATION_CONFLICT
       shell: bash
     - name: Validate ENV Variables
       run: |
