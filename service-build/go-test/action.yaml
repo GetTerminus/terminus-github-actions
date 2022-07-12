@@ -36,6 +36,7 @@ runs:
 
         declare -A inputs
         inputs[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]=$GOLANG_PROTOBUF_REGISTRATION_CONFLICT
+        validateInput inputs
       shell: bash
     - name: Validate ENV Variables
       run: |
