@@ -64,7 +64,7 @@ runs:
       with:
         go-version: ${{ steps.id_version.outputs.GO_VERSION }}
     - name: run tests
-      run: go run github.com/onsi/ginkgo/v2/ginkgo -r --fail-on-pending --cover --trace --race --progress -cover -coverprofile=profile.cov -output-dir=$GITHUB_WORKSPACE --junit-report=report.xml
+      run: go run github.com/onsi/ginkgo/v2/ginkgo -r --fail-on-pending --cover --trace --race --progress -cover -keep-separate-coverprofiles -coverprofile=profile.cov -output-dir=$GITHUB_WORKSPACE --junit-report=report.xml
       shell: bash
     - name: Store Artifacts
       uses: actions/upload-artifact@v3
@@ -103,7 +103,7 @@ runs:
       run: |
         mkdir $GITHUB_WORKSPACE/coverage
         find -type f -name 'profile.cov' -exec cat {} \; > merged.cov
-        gcov2lcov -infile $GITHUB_WORKSPACE/merged.cov -outfile $GITHUB_WORKSPACE/coverage/lcov.info
+        go run github.com/jandelgado/gcov2lcov -infile $GITHUB_WORKSPACE/merged.cov -outfile $GITHUB_WORKSPACE/coverage/lcov.info
       shell: bash
     - name: Coveralls
       uses: coverallsapp/github-action@v1.1.2
