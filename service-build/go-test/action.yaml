@@ -106,9 +106,14 @@ runs:
         go run github.com/jandelgado/gcov2lcov -infile $GITHUB_WORKSPACE/merged.cov -outfile $GITHUB_WORKSPACE/coverage/lcov.info
       shell: bash
     - name: Coveralls
+      id: coveralls
       uses: coverallsapp/github-action@v1.1.2
       with:
         github-token: ${{ inputs.github_token }}
+    - name: test
+      run: |
+        echo "${{ steps.coveralls.outputs.coveralls-api-result }}"
+      shell: bash
     - name: Report DD CI
       env:
         DATADOG_API_KEY: ${{ inputs.dd_api_key }}
