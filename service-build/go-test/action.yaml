@@ -7,11 +7,15 @@ inputs:
   service_name:
     description: '[string] Name of the service being tested.'
     required: true
+  artifactory_enabled:
+    description: '[bool] Whether or not GOPROXY is set up for artifactory.'
+    required: true
+    default: "false"
   github_token:
     description: '[secret] GitHub Token.'
     required: true
   dd_api_key:
-    description: '[secret] DataDog API Key.'
+    description: '[secret] DataDog API Key used to upload ci results to datadog.'
     required: true
 
 runs:
@@ -37,7 +41,10 @@ runs:
 
         declare -A envVariables
         envVariables[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]=$GOLANG_PROTOBUF_REGISTRATION_CONFLICT
-        envVariables[GOPROXY]=$GOPROXY
+        if [ ${{ inputs.artifactory_enabled }} -eq "true" ]
+        then
+          envVariables[GOPROXY]=$GOPROXY
+        fi
         envVariables[GONOSUMDB]=$GONOSUMDB
 
         validateInput envVariables
@@ -96,7 +103,7 @@ runs:
       run: |
         mkdir $GITHUB_WORKSPACE/coverage
         find -type f -name 'profile.cov' -exec cat {} \; > merged.cov
-        go run github.com/jandelgado/gcov2lcov -infile $GITHUB_WORKSPACE/merged.cov -outfile $GITHUB_WORKSPACE/coverage/lcov.info
+        gcov2lcov -infile $GITHUB_WORKSPACE/merged.cov -outfile $GITHUB_WORKSPACE/coverage/lcov.info
       shell: bash
     - name: Coveralls
       uses: coverallsapp/github-action@v1.1.2

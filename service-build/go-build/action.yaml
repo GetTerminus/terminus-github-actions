@@ -7,6 +7,10 @@ inputs:
   service_name:
     description: '[string] Name of the service being built.'
     required: true
+  artifactory_enabled:
+    description: '[bool] Whether or not GOPROXY is set up for artifactory.'
+    required: true
+    default: "false"
   ecr_pusher_access_key_id:
     description: '[secret] AWS ECR Access Key ID.'
     required: true
@@ -17,7 +21,7 @@ inputs:
     description: '[secret] DockerHub Username.'
     required: true
   dockerhub_token:
-    description: '[secret] DockerHub Username.'
+    description: '[secret] DockerHub Token.'
     required: true
   target_directory:
     description: '[string] Target directory for build commands.'
@@ -51,7 +55,10 @@ runs:
         validateInput inputs
         declare -A envVariables
         envVariables[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]=$GOLANG_PROTOBUF_REGISTRATION_CONFLICT
-        envVariables[GOPROXY]=$GOPROXY
+        if [ ${{ inputs.artifactory_enabled }} -eq "true" ]
+        then
+          envVariables[GOPROXY]=$GOPROXY
+        fi
         envVariables[GONOSUMDB]=$GONOSUMDB
 
         validateInput envVariables
