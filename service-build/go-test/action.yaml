@@ -55,18 +55,37 @@ runs:
         ssh-private-key: ${{ inputs.ssh_key }}
     - name: Checkout code
       uses: actions/checkout@v3
-    - id: id_version
-      name: Identify Go Version
+    - name: Get PR if Exists
+      if: ${{ github.event_name == 'push' }}
+      id: pr_info
+      uses: 8BitJonny/gh-get-current-pr@1.2.0
+      with:
+        github-token: ${{ inputs.github_token }}
+    - name: Set Skip Variable on Push if PR Present
+      id: skip_workflow
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        if [ ! ${{ steps.pr_info.outputs.number }} -eq '' ]
+        then
+          echo "::set-output  name=SKIP::true"
+        fi
+      shell: bash
+    - name: Identify Go Version
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
+      id: id_version
       run: echo "::set-output  name=GO_VERSION::$(cat go.mod | grep -oe "^go .*$" | grep -oe "[^ ]\+$")"
       shell: bash
     - name: Install Go
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
       uses: actions/setup-go@v2
       with:
         go-version: ${{ steps.id_version.outputs.GO_VERSION }}
     - name: run tests
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
       run: go run github.com/onsi/ginkgo/v2/ginkgo -r --fail-on-pending --cover --trace --race --progress -cover -coverprofile=profile.cov -output-dir=$GITHUB_WORKSPACE --junit-report=report.xml
       shell: bash
     - name: Store Artifacts
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
       uses: actions/upload-artifact@v3
       with:
         name: build-metrics
@@ -74,47 +93,51 @@ runs:
           report.xml
           **/profile.cov
     - name: golangci-lint
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
       uses: golangci/golangci-lint-action@v3
     - id: id_buf_version
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
       name: Identify Buf Version
       run: echo "::set-output  name=BUF_VERSION::$(cat go.mod | grep -oe "^\sgithub.com/bufbuild/buf v[0-9]\+\(.[0-9]\+\)\+$" | grep -oe "[0-9]\+\(.[0-9]\+\)\+$")"
       shell: bash
     - uses: bufbuild/buf-setup-action@v1.4.0
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
       with:
         version: ${{ steps.id_buf_version.outputs.BUF_VERSION }}
         github_token: ${{ inputs.github_token }}
     - uses: bufbuild/buf-lint-action@v1
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
     - uses: bufbuild/buf-breaking-action@v0.4.0
       name: Review breaking changes for PR
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' && ${{ steps.skip_workflow.outputs.skip }} == 'true'
       with:
         # The 'main' branch of the GitHub repository that defines the module.
         against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=${{ github.event.pull_request.base.sha }}"
     - uses: bufbuild/buf-breaking-action@v0.4.0
       name: Review breaking changes against Default branch
-      if: github.event_name != 'pull_request'
+      if: github.event_name != 'pull_request' && ${{ steps.skip_workflow.outputs.skip }} == 'true'
       with:
         # The 'main' branch of the GitHub repository that defines the module.
         against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=${{ github.event.repository.default_branch }}"
     - uses: actions/download-artifact@v3
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
       with:
         name: build-metrics
     - name: Build Coverage
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
       run: |
         mkdir $GITHUB_WORKSPACE/coverage
         find -type f -name 'profile.cov' -exec cat {} \; > merged.cov
         go run github.com/jandelgado/gcov2lcov -infile $GITHUB_WORKSPACE/merged.cov -outfile $GITHUB_WORKSPACE/coverage/lcov.info
       shell: bash
     - name: Coveralls
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
       id: coveralls
       uses: coverallsapp/github-action@v1.1.2
       with:
         github-token: ${{ inputs.github_token }}
-    - name: test
-      run: |
-        echo "${{ steps.coveralls.outputs.coveralls-api-result }}"
-      shell: bash
     - name: Report DD CI
+      if: ${{ steps.skip_workflow.outputs.skip }} == 'true'
       env:
         DATADOG_API_KEY: ${{ inputs.dd_api_key }}
         DD_ENV: ci
