@@ -14,12 +14,6 @@ inputs:
     description: '[bool] [not required] (i.e. true/false) Enable the tf plan commenter.'
     required: false
     default: 'true'
-  tf_create_workspace:
-    description: '[bool] [not required] (i.e. true/false) If set to true, workspace will be created based on TF_WORKSPACE.
-                  This should only be run when creating the repo and running
-                  the plan for the first time and removed after.'
-    required: false
-    default: 'false'
 runs:
   using: "composite"
   steps:
@@ -83,12 +77,6 @@ runs:
         commenter_type: init
         commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
         commenter_exitcode: ${{ steps.init.outputs.exitcode }}
-    - name: TF Plan - Create Workspace
-      if: ${{ inputs.tf_create_workspace == 'true' }}
-      run: |
-        terraform workspace new ${{ env.TF_WORKSPACE }}
-        terraform workspace select ${{ env.TF_WORKSPACE }}
-      shell: bash
     - name: TF Plan - Validate
       id: validate
       run: |
