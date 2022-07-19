@@ -4,63 +4,103 @@ inputs:
   ssh_key:
     description: '[secret] GitHub SSH Key for pulling repo.'
     required: true
-  go_version:
-    description: '[string] GO version for build.'
+  service_name:
+    description: '[string] Name of the service being built.'
     required: true
-  cmd_to_build:
-    description: '[string] cmd to build.'
+  artifactory_enabled:
+    description: '[bool] Whether or not GOPROXY is set up for artifactory.'
     required: true
-    
+    default: "false"
+  ecr_pusher_access_key_id:
+    description: '[secret] AWS ECR Access Key ID.'
+    required: true
+  ecr_pusher_access_key:
+    description: '[secret] AWS ECR Access Key.'
+    required: true
+  dockerhub_username:
+    description: '[secret] DockerHub Username.'
+    required: true
+  dockerhub_token:
+    description: '[secret] DockerHub Token.'
+    required: true
+  target_directory:
+    description: '[string] Target directory for build commands.'
+    required: true
+
 runs:
   using: "composite"
   steps:
     - name: Validate Inputs
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
-        GO_VERSION: ${{ inputs.go_version }}
-        CMD_TO_BUILD: ${{ inputs.cmd_to_build }}
+        SERVICE_NAME: ${{ inputs.service_name }}
+        ECR_PUSHER_ACCESS_KEY_ID: ${{ inputs.ecr_pusher_access_key_id }}
+        ECR_PUSHER_ACCESS_KEY: ${{ inputs.ecr_pusher_access_key }}
+        DOCKERHUB_USERNAME: ${{ inputs.dockerhub_username }}
+        DOCKERHUB_TOKEN: ${{ inputs.dockerhub_token }}
+        TARGET_DIRECTORY: ${{ inputs.target_directory }}
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
-        
+
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
-        inputs[go_version]="$GO_VERSION"
-        inputs[cmd_to_build]="$CMD_TO_BUILD"
-        
+        inputs[service_name]="$SERVICE_NAME"
+        inputs[ecr_pusher_access_key_id]="$ECR_PUSHER_ACCESS_KEY_ID"
+        inputs[ecr_pusher_access_key]="$ECR_PUSHER_ACCESS_KEY"
+        inputs[dockerhub_username]="$DOCKERHUB_USERNAME"
+        inputs[dockerhub_token]="$DOCKERHUB_TOKEN"
+        inputs[target_directory]="$TARGET_DIRECTORY"
+
         validateInput inputs
-      shell: bash
-    - name: Set Environmental Variables
-      run: |
-        echo "GOPRIVATE=github.com/GetTerminus/*" >> $GITHUB_ENV
-        echo "GOFLAGS=-mod=vendor" >> $GITHUB_ENV
-        echo "CGO_ENABLED=0" >> $GITHUB_ENV
-        echo "GOOS=linux" >> $GITHUB_ENV
-        echo "GOARCH=amd64" >> $GITHUB_ENV
+        declare -A envVariables
+        envVariables[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]=$GOLANG_PROTOBUF_REGISTRATION_CONFLICT
+        if [ ${{ inputs.artifactory_enabled }} -eq "true" ]
+        then
+          envVariables[GOPROXY]=$GOPROXY
+        fi
+        envVariables[GONOSUMDB]=$GONOSUMDB
+
+        validateInput envVariables
       shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
       with:
         ssh-private-key: ${{ inputs.ssh_key }}
-    - name: Install Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{ inputs.go_version }}
     - name: Pull
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        lfs: true
-    - name: Build
+        aws-access-key-id: ${{ inputs.ecr_pusher_access_key_id }}
+        aws-secret-access-key: ${{ inputs.ecr_pusher_access_key }}
+        aws-region: us-east-1
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ inputs.dockerhub_username }}
+        password: ${{ inputs.dockerhub_token }}
+    - name: Build & Push cmd/${{ inputs.target_directory }}
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ inputs.service_name }}
+        SHA: ${{ github.sha }}
+        TARGET_COMMAND: ${{ inputs.target_directory }}
       run: |
-        cd "./cmd/${{ inputs.cmd_to_build }}"
-        go build -installsuffix cgo
-        mkdir -p "../../build/bins"
-        mv "${{ inputs.cmd_to_build }}" "../../build/bins/${{ inputs.cmd_to_build }}"
+        DOCKERFILE=cmd/$TARGET_COMMAND/Dockerfile
+        if [[ -f $DOCKERFILE ]];then
+          IMAGE_TAG=$TARGET_COMMAND-$SHA
+          echo "Building cmd/$TARGET_COMMAND with $DOCKERFILE and pushing to $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker build --build-arg goproxy=$GOPROXY --build-arg target_directory=./cmd/$TARGET_COMMAND/ -f $DOCKERFILE -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        else
+          echo "Unable to build cmd/$TARGET_COMMAND no Dockerfile found, expecting it at $DOCKERFILE"
+        fi
       shell: bash
-    - name: Store
-      uses: actions/upload-artifact@v2
-      with:
-        name: go-build
-        path: build/bins
-        retention-days: 1
-        
+    - name: Logout of Amazon ECR
+      if: always()
+      run: docker logout ${{ steps.login-ecr.outputs.registry }}
+      shell: bash

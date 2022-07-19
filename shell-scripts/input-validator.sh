@@ -25,6 +25,7 @@ info () {
 function validateInput() {
   debug "$1"
   local -n arr=$1
+
   error_count=0
   for key in "${!arr[@]}";
     do
@@ -36,9 +37,9 @@ function validateInput() {
     done
   if [ "$error_count" -gt 0 ]
   then
-    info "For a list of required inputs, please check the corresponding directory in: https://github.com/GetTerminus/terminus-github-actions"
+    info "For a list of required inputs/env variables, please check the corresponding directory in: https://github.com/GetTerminus/terminus-github-actions."
     exit 1
   else
-    success "Input validation passed!"
+    success "Input/Env Variable validation passed!"
   fi
 }

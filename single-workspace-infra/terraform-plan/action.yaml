@@ -55,9 +55,9 @@ runs:
       #TODO: Uncomment once github supports it
       #continue-on-error: true
       shell: bash
-    - name: Post TF Format Comment
+    - name: Post TF Format Check
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
-      uses: robburger/terraform-pr-commenter@v1.5.0
+      uses: GetTerminus/terraform-pr-commenter@v2
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         EXPAND_SUMMARY_DETAILS: "false"
@@ -75,7 +75,7 @@ runs:
       # TODO: Add in the below code to all plan commenter if statements when github adds in the functionality
       # (steps.init.outcome == 'success' || steps.init.outcome == 'failure')
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
-      uses: robburger/terraform-pr-commenter@v1.5.0
+      uses: GetTerminus/terraform-pr-commenter@v2
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         EXPAND_SUMMARY_DETAILS: "false"
@@ -97,7 +97,7 @@ runs:
       shell: bash
     - name: Post TF Validate Comment
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
-      uses: robburger/terraform-pr-commenter@v1.5.0
+      uses: GetTerminus/terraform-pr-commenter@v2
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         EXPAND_SUMMARY_DETAILS: "false"
@@ -130,7 +130,7 @@ runs:
         exit $EXITCODE
     - name: Post TF Plan Comment
       if: ${{ always() && github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && inputs.enable_plan_commenter == 'true' }}
-      uses: GetTerminus/terraform-pr-commenter@master
+      uses: GetTerminus/terraform-pr-commenter@v2
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         EXPAND_SUMMARY_DETAILS: "false"

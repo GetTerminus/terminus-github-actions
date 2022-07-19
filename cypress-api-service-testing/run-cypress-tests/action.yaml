@@ -1,0 +1,81 @@
+name: 'Run Cypress Tests Vs API Service'
+description: 'Runs Terminus API Service Cypress Tests : Include env block for any environment variables needed, ex: CYPRESS_BASE_URL, CYPRESS_ts_user_email, etc'
+inputs:
+  environment:
+    description: 'The environment against which to run tests (ex: ninja)'
+    required: true
+  repo:
+    description: 'The repo name containing the service being tested and its tests.'
+    required: true
+  repo_owner:
+    description: 'The owner of the service/test repo'
+    required: false
+    default: 'GetTerminus'
+  repo_ref:
+    description: 'The ref to get for the service/test repo'
+    required: false
+    default: 'main'
+  repo_checkout_token:
+    description: 'The GH token that can pull down the service/test repo.'
+    required: true
+  repo_cypress_dir:
+    description: 'The directory within the service/test repo containing the Cypress tests'
+    required: false
+    default: 'cypress-e2e'
+  cypress_browser:
+    description: 'The browser to test against'
+    required: false
+    default: 'chrome'
+  cypress_test_tags:
+    description: 'Cypress tags to run'
+    required: false
+    default: '@SMOKE'
+  cypress_record_key:
+    description: 'The Cypress Dashboard Record Key'
+    required: true
+  cypress_ci_build_id:
+    description: 'The ci-build-id to attach to the Cypress process. Must be unique per execution'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout Service
+      uses: actions/checkout@v2
+      with:
+        repository: "${{ inputs.repo_owner }}/${{ inputs.repo }}"
+        ref: ${{ inputs.repo_ref }}
+        token: ${{ inputs.repo_checkout_token }}
+
+    - name: Yarn Install
+      run: |
+        cd ${{ inputs.repo_cypress_dir }}
+        yarn install
+      shell: bash
+    
+    - name: Get working directory for tests
+      shell: bash
+      run: |
+        cd ${{ inputs.repo_cypress_dir }}
+        echo "CYDIR=$(pwd)" >> $GITHUB_ENV
+
+    - name: Run Tests
+      uses: cypress-io/github-action@v3
+      with:
+        config: video=true
+        command-prefix: yarn
+        browser: ${{ inputs.cypress_browser }}
+        headless: true
+        tag: 'API-${{ inputs.cypress_browser }},${{ inputs.environment }}'
+        record: true
+        parallel: true
+        working-directory: ${{ env.CYDIR }}
+        ci-build-id: ${{ inputs.cypress_ci_build_id }}
+      env:
+        CYPRESS_RECORD_KEY: ${{ inputs.cypress_record_key}}
+        YARN_NODE_LINKER: pnp
+        CYPRESS_grepTags: ${{ inputs.cypress_test_tags }}
+        DD_ENV: ${{ inputs.environment }}
+        DD_SERVICE: ${{ inputs.repo }}
+        DEBUG: '@cypress/github-action'
+        GITHUB_REPOSITORY: '${{ inputs.repo_owner }}/${{ inputs.repo }}'

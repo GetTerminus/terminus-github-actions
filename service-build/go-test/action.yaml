@@ -4,63 +4,117 @@ inputs:
   ssh_key:
     description: '[secret] GitHub SSH Key for pulling repo.'
     required: true
-  go_version:
-    description: '[string] GO version for build and test.'
+  service_name:
+    description: '[string] Name of the service being tested.'
     required: true
-  dynamo_test_endpoint:
-    description: '[string] dynamo_test_endpoint.'
+  artifactory_enabled:
+    description: '[bool] Whether or not GOPROXY is set up for artifactory.'
     required: true
-  coveralls_token:
-    description: '[secret] coveralls token.'
+    default: "false"
+  github_token:
+    description: '[secret] GitHub Token.'
     required: true
-    
+  dd_api_key:
+    description: '[secret] DataDog API Key used to upload ci results to datadog.'
+    required: true
+
 runs:
   using: "composite"
   steps:
-    - name: Validate Inputs
+    - name: Validate Inputs/Env Variables
       env:
         SSH_KEY: ${{ inputs.ssh_key }}
-        GO_VERSION: ${{ inputs.go_version }}
-        DYNAMO_TEST_ENDPOINT: ${{ inputs.dynamo_test_endpoint }}
-        COVERALLS_TOKEN: ${{ inputs.coveralls_token }}
+        SERVICE_NAME: ${{ inputs.service_name }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        DD_API_KEY: ${{ inputs.dd_api_key }}
       run: |
         cd ${{ github.action_path }}
         source ../../shell-scripts/input-validator.sh
-        
+
         declare -A inputs
         inputs[ssh_key]="$SSH_KEY"
-        inputs[go_version]="$GO_VERSION"
-        inputs[dynamo_test_endpoint]="$DYNAMO_TEST_ENDPOINT"
-        inputs[coveralls_token]="$COVERALLS_TOKEN"
-        
+        inputs[service_name]="$SERVICE_NAME"
+        inputs[github_token]="$GITHUB_TOKEN"
+        inputs[dd_api_key]="$DD_API_KEY"
+
         validateInput inputs
-      shell: bash
-    - name: Set Environmental Variables
-      run: |
-        echo "GOPRIVATE=github.com/GetTerminus/*" >> $GITHUB_ENV
-        echo "GOFLAGS=-mod=vendor" >> $GITHUB_ENV
+
+        declare -A envVariables
+        envVariables[GOLANG_PROTOBUF_REGISTRATION_CONFLICT]=$GOLANG_PROTOBUF_REGISTRATION_CONFLICT
+        if [ ${{ inputs.artifactory_enabled }} -eq "true" ]
+        then
+          envVariables[GOPROXY]=$GOPROXY
+        fi
+        envVariables[GONOSUMDB]=$GONOSUMDB
+
+        validateInput envVariables
       shell: bash
     - name: Install SSH Key
       uses: webfactory/ssh-agent@v0.4.1
       with:
         ssh-private-key: ${{ inputs.ssh_key }}
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - id: id_version
+      name: Identify Go Version
+      run: echo "::set-output  name=GO_VERSION::$(cat go.mod | grep -oe "^go .*$" | grep -oe "[^ ]\+$")"
+      shell: bash
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ inputs.go_version }}
-    - uses: actions/checkout@v2
-    - name: Go Lint
-      uses: golangci/golangci-lint-action@v2
-      with:
-        version: latest
-    - name: Test
-      run: go test -v -race -coverprofile=profile.cov -shuffle on ./...
-      env:
-        DYNAMO_TEST_ENDPOINT: ${{ inputs.dynamo_test_endpoint }}
+        go-version: ${{ steps.id_version.outputs.GO_VERSION }}
+    - name: run tests
+      run: go run github.com/onsi/ginkgo/v2/ginkgo -r --fail-on-pending --cover --trace --race --progress -cover -coverprofile=profile.cov -output-dir=$GITHUB_WORKSPACE --junit-report=report.xml
       shell: bash
-    - name: Send coverage
-      uses: shogo82148/actions-goveralls@v1
+    - name: Store Artifacts
+      uses: actions/upload-artifact@v3
       with:
-        path-to-profile: profile.cov
-        token: ${{ inputs.coveralls_token }}
-        
+        name: build-metrics
+        path: |
+          report.xml
+          **/profile.cov
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+    - id: id_buf_version
+      name: Identify Buf Version
+      run: echo "::set-output  name=BUF_VERSION::$(cat go.mod | grep -oe "^\sgithub.com/bufbuild/buf v[0-9]\+\(.[0-9]\+\)\+$" | grep -oe "[0-9]\+\(.[0-9]\+\)\+$")"
+      shell: bash
+    - uses: bufbuild/buf-setup-action@v1.4.0
+      with:
+        version: ${{ steps.id_buf_version.outputs.BUF_VERSION }}
+        github_token: ${{ inputs.github_token }}
+    - uses: bufbuild/buf-lint-action@v1
+    - uses: bufbuild/buf-breaking-action@v0.4.0
+      name: Review breaking changes for PR
+      if: github.event_name == 'pull_request'
+      with:
+        # The 'main' branch of the GitHub repository that defines the module.
+        against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=${{ github.event.pull_request.base.sha }}"
+    - uses: bufbuild/buf-breaking-action@v0.4.0
+      name: Review breaking changes against Default branch
+      if: github.event_name != 'pull_request'
+      with:
+        # The 'main' branch of the GitHub repository that defines the module.
+        against: "https://github.com/${GITHUB_REPOSITORY}.git#branch=${{ github.event.repository.default_branch }}"
+    - uses: actions/download-artifact@v3
+      with:
+        name: build-metrics
+    - name: Build Coverage
+      run: |
+        mkdir $GITHUB_WORKSPACE/coverage
+        find -type f -name 'profile.cov' -exec cat {} \; > merged.cov
+        go run github.com/jandelgado/gcov2lcov -infile $GITHUB_WORKSPACE/merged.cov -outfile $GITHUB_WORKSPACE/coverage/lcov.info
+      shell: bash
+    - name: Coveralls
+      id: coveralls
+      uses: coverallsapp/github-action@v1.1.2
+      with:
+        github-token: ${{ inputs.github_token }}
+    - name: Report DD CI
+      env:
+        DATADOG_API_KEY: ${{ inputs.dd_api_key }}
+        DD_ENV: ci
+      run: |
+        npm install -g @datadog/datadog-ci
+        datadog-ci junit upload --service ${{ inputs.service_name }} report.xml
+      shell: bash
