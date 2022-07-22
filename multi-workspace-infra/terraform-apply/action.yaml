@@ -101,8 +101,8 @@ runs:
         terraform validate
         terraform workspace select ${{ inputs.terraform_workspace }}
         terraform workspace show
-        terraform plan -var-file=vars/${{ inputs.terraform_workspace }}.tfvars -parallelism=${{ input.terraform_parallelism }} -lock=true -lock-timeout=0s -input=false -out=tfplan
-        terraform apply -lock=true -parallelism=${{ input.terraform_parallelism }} -lock-timeout=0s -input=false tfplan
+        terraform plan -var-file=vars/${{ inputs.terraform_workspace }}.tfvars -parallelism=${{ inputs.terraform_parallelism }} -lock=true -lock-timeout=0s -input=false -out=tfplan
+        terraform apply -lock=true -parallelism=${{ inputs.terraform_parallelism }} -lock-timeout=0s -input=false tfplan
       shell: bash
     - name: Set Github Repo to Env Variable
       run: |
