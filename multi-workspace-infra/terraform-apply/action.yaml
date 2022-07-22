@@ -10,6 +10,11 @@ inputs:
   terraform_workspace:
     description: '[string] (i.e. ninja/prod-east) TF Workspace.'
     required: true
+  terraform_parallelism:
+    description: '[integer] The parallelism value to pass to Terraform '
+    required: false
+    # This is the TF default
+    default: 10
   artifactory_enabled:
     description: '[bool] (i.e. true/false) Whether or not the repo uses artifactory for the helm chart.'
     default: 'false'
@@ -96,8 +101,8 @@ runs:
         terraform validate
         terraform workspace select ${{ inputs.terraform_workspace }}
         terraform workspace show
-        terraform plan -var-file=vars/${{ inputs.terraform_workspace }}.tfvars -lock=true -lock-timeout=0s -input=false -out=tfplan
-        terraform apply -lock=true -lock-timeout=0s -input=false tfplan
+        terraform plan -var-file=vars/${{ inputs.terraform_workspace }}.tfvars -parallelism=${{ input.terraform_parallelism }} -lock=true -lock-timeout=0s -input=false -out=tfplan
+        terraform apply -lock=true -parallelism=${{ input.terraform_parallelism }} -lock-timeout=0s -input=false tfplan
       shell: bash
     - name: Set Github Repo to Env Variable
       run: |

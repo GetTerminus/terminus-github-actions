@@ -10,6 +10,11 @@ inputs:
   terraform_workspace:
     description: '[string] (i.e. ninja/prod-east) TF Workspace.'
     required: true
+  terraform_parallelism:
+    description: '[integer] The parallelism value to pass to Terraform '
+    required: false
+    # This is the TF default
+    default: 10
   github_token:
     description: '[secret] Github token for plan commenter to use.'
     required: true
@@ -155,7 +160,7 @@ runs:
         exec 5>&1
 
         # merge stderr into stdout and print it to fd5 (parent shell's stdout); exit with the code from terraform plan
-        OUTPUT=$(terraform plan -var-file=vars/${{ inputs.terraform_workspace }}.tfvars -lock=false -input=false -out=tfplan 2>&1 | tee /dev/fd/5; exit ${PIPESTATUS[0]})
+        OUTPUT=$(terraform plan -var-file=vars/${{ inputs.terraform_workspace }}.tfvars -parallelism=${{ input.terraform_parallelism }} -lock=false -input=false -out=tfplan 2>&1 | tee /dev/fd/5; exit ${PIPESTATUS[0]})
 
         # store the exit code here
         EXITCODE=$?
