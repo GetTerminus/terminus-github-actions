@@ -38,6 +38,10 @@ inputs:
     description: 'A checkout-able object. Blank defaults to the Action default behavior'
     required: false
     default: ''
+  pre_apply_target:
+    description: '[string][advanced][do not use] A targeted resource to have terraform `apply` prior to planning.  USE WITH CAUTION.'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -69,12 +73,11 @@ runs:
       with:
         ref: ${{ inputs.checkout_ref }}
         lfs: true
-    - name: Helm Update
+    - name: Helm Repo Update
       if: ${{ inputs.artifactory_enabled == 'true' }}
       run: |
         helm repo add terminus https://getterminus.jfrog.io/artifactory/default-helm/ --username developer --password ${{ inputs.artifactory_read_access_token }}
         helm repo update
-        find helm/charts -maxdepth 1 -not -path "helm/charts" | xargs -n 1 helm dependency update
       shell: bash
     - name: HashiCorp - Setup Terraform
       uses: hashicorp/setup-terraform@v1.2.1
@@ -145,6 +148,18 @@ runs:
         commenter_input: ${{ format('{0}{1}', steps.validate.outputs.stdout, steps.validate.outputs.stderr) }}
         commenter_exitcode: ${{ steps.validate.outputs.exitcode }}
         terraform_version: ${{ inputs.terraform_version }}
+    - name: TF Plan - Targeted pre-apply
+      if: ${{ inputs.pre_apply_target != '' }}
+      # please don't use this.
+      id: pre-apply
+      run: |
+        terraform apply -target=${{ inputs.pre_apply_target }} -var-file=vars/${{ inputs.terraform_workspace }}.tfvars -input=false
+      shell: bash
+    - name: Helm Dependency Update
+      if: ${{ inputs.artifactory_enabled == 'true' }}
+      run: |
+        find helm/charts -maxdepth 1 -not -path "helm/charts" | xargs -n 1 helm dependency update
+      shell: bash
     - name: TF Plan - Run
       id: plan
       # have to use /bin/bash because GHA runs by default with `set -e` to end execution on any error.
